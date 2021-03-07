@@ -48,7 +48,7 @@ With that disclaimer made, you are welcome to use this code for your own purpose
 
 This will be manifest eventually!
 
-For now: you can explore Graphoire in a python environment by downloading the source and adding the `pyhon-src` directory to your `$PYTHONPATH`. 
+For now: you can explore Graphoire in a python environment by downloading the source and adding the `python-src` directory to your `$PYTHONPATH`. 
 
 ---
 Author: Christopher Corbell  
