@@ -10,9 +10,15 @@ from graphoire.graph import Graph
 
 class GraphFactory:
     def makeEmpty(n: int):
+        """
+        Return an empty Graph with n vertices.
+        """
         return Graph(n)
     
     def makePath(n: int):
+        """
+        Return a path Graph with n vertices.
+        """
         path = Graph(n)
         for i in range(0, n-1):
             #print(f"DEBUG - appending edge ({i}, {i+1})")
@@ -20,6 +26,9 @@ class GraphFactory:
         return path
     
     def makeCycle(n: int):
+        """
+        Return a cycle Graph with n vertices.
+        """
         cycle = Graph(n)
         for i in range(0, n-1):
             #print(f"DEBUG - appending edge ({i}, {i+1})")
@@ -30,6 +39,9 @@ class GraphFactory:
         return cycle
     
     def makeComplete(n: int):
+        """
+        Return a complete Graph with n vertices.
+        """
         complete = Graph(n)
         for i in range(0, n-1):
             for j in range(i+1, n):
@@ -38,6 +50,16 @@ class GraphFactory:
         return complete
     
     def makeBipartiteComplete(m: int, n: int):
+        """
+        Return a complete bipartite Graph with m+n vertices.
+
+        Parameters
+        ----------
+        m : int
+            The size of the first partition.
+        n : int
+            The size of the second partition.
+        """
         bip = Graph(m + n)
         for i in range(0, m):
             for j in range(m, m+n):
@@ -45,10 +67,13 @@ class GraphFactory:
                 bip.edges.append([i, j])
         return bip
         
-    def makeKPartiteComplete(sizes: list[int]):
+    def makeKPartiteComplete(sizelist):
     	pass
     
     def makeHouse():
+        """
+        Return a 5-vertex 'house' Graph.
+        """
         house = GraphFactory.makeCycle(4)
         house.n = 5
         house.addEdge(0, 4)
@@ -56,12 +81,18 @@ class GraphFactory:
         return house
     
     def makeClaw():
+        """
+        Return a 4-vertex 'claw' Graph.
+        """
         claw = GraphFactory.makePath(3)
         claw.n = 4
         claw.addEdge(1, 3)
         return claw
     
     def makeBowtie():
+        """
+        Return a 5-vertex 'bowtie' Graph.
+        """
         bowtie = GraphFactory.makeComplete(3)
         bowtie.n = 5
         bowtie.addEdge(1,3)
@@ -69,11 +100,17 @@ class GraphFactory:
         return bowtie
     
     def makeKite():
+        """
+        Return a 4-vertex 'kite' Graph.
+        """
         kite = GraphFactory.makeCycle(4)
         kite.addEdge(0, 2)
         return kite
         
     def makePetersen():
+        """
+        Return a 10-vertex Petersen Graph.
+        """
         pet = GraphFactory.makeCycle(5)
         pet.n = 10
         secondCycle = []

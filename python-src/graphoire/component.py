@@ -9,11 +9,17 @@ Created on Sat Mar  6 11:28:27 2021
 from graphoire.graph import Graph
 
 def isEulerian(G: Graph):
+    """
+    Return True if the graph is (undirected) Eulerian.
+    """
     if G.n > 2 and isConnected(G):
         return G.isEven()
     return False
 
 def isConnected(G: Graph):
+    """
+    Return True if the graph is connected.
+    """
     # fast check on number of edges
     if len(G.edges) < G.n - 1:
         # not possible to be connected
@@ -28,9 +34,29 @@ def isConnected(G: Graph):
     return len(comp0) == G.n
 
 def isConnectedAcyclic(G: Graph):
-    return gwIsConnected(G) and len(G.edges) == G.n - 1
+    """
+    Return True if the graph is a tree (connected and acyclic)
+    """
+    return isConnected(G) and len(G.edges) == G.n - 1
 
 def verticesAreConnected(G: Graph, vertices):
+    """
+    Return true if the vertices indicated are connected by a path in G.
+    
+    Parameters
+    ----------
+    G : The Graph object.
+    vertices : a list of vertex indices. E.g., provide two vertices if
+      you want to test connection between any two points of the graph.
+
+    Raises
+    ------
+    Exception if a vertex index is invalid / out-of-range.
+
+    Returns
+    -------
+    True if all requested vertices are connected (in the same component).
+    """
     comps = findComponents(G)
     vertexNotFound = True
     for comp in comps:
@@ -45,6 +71,24 @@ def verticesAreConnected(G: Graph, vertices):
         raise Exception(f"Bad vertex parameter - vertex {vertices[0]} not in any component")
     
 def findComponents(G: Graph):
+    """
+    Find all the components of the Graph.
+
+    Parameters
+    ----------
+    G : The graph
+
+    Behavior:
+        A component is represented as a list of vertex integer indices.
+        (If you want the component's edges, you can query or use the
+         inducedSubgraph method of the Graph with the given vertices.)
+        This method returns a list of such components - so it is a list
+        of (disjoint) lists of integers. An isolated vertex is represented as
+        a list containing a single integer.
+    Returns
+    -------
+    components : list of vertex-index component lists. Components are sorted ascending.
+    """
     components = []
     visited = set()
     
@@ -72,6 +116,18 @@ def findComponents(G: Graph):
     return components
         
 def findComponentWithVertex(G: Graph, vertex: int):
+    """
+    Determine and return the list of all vertices reachable from a vertex.
+
+    Parameters
+    ----------
+    G : the Graph
+    vertex : int
+        The vertex index.
+
+    Returns a list of vertex indices which are in the same component
+    as the indicated vertex. The vertex-index-list is sorted ascending.
+    """
     componentSet = set()
     componentSet.add(vertex)
     
