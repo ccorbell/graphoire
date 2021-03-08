@@ -7,5 +7,7 @@ Created on Sun Mar  7 13:36:24 2021
 """
 
 from graphoiretests.graphtests import RunAllGraphTests
+from graphoiretests.prufertests import RunAllPruferTests
 
-RunAllGraphTests()
+#RunAllGraphTests()
+RunAllPruferTests()

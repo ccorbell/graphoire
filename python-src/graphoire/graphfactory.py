@@ -125,6 +125,10 @@ class GraphFactory:
         pet.addEdge(1, 8)
         pet.addEdge(3, 9)
         
+    #def makeRandomTree(n: int):
+    #    tree = Graph(n)
+        
+        
     def makeGrotzsch():
         pass
         

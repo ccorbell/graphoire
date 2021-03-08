@@ -33,12 +33,6 @@ def isConnected(G: Graph):
     # is not connected
     return len(comp0) == G.n
 
-def isConnectedAcyclic(G: Graph):
-    """
-    Return True if the graph is a tree (connected and acyclic)
-    """
-    return isConnected(G) and len(G.edges) == G.n - 1
-
 def verticesAreConnected(G: Graph, vertices):
     """
     Return true if the vertices indicated are connected by a path in G.

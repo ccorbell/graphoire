@@ -45,43 +45,8 @@ class Graph:
         self.directed = False
         
         self.degree_cache = {}
+	
     
-    def hasVertexLabels(self):
-        """
-        Returns true if this Graph object has any vertex labels set.
-        """
-        return None != self.vtx_labels and len(self.vtx_labels) > 0
-        
-    def hasEdgeLabels(self):
-        """
-        Returns true if this Graph object has any edge labels set.
-        """
-        return None != self.edge_labels and len(self.edge_labels) > 0
-	
-    def hasVertexWeights(self):
-        """
-        Returns true if this Graph object has any vertex weihts set.
-        """
-        return None != self.vtx_weights and len(self.vtx_weights) > 0
-	
-    def hasEdgeWeights(self):
-        """
-        Returns true if this Graph object has any edge weights set.
-        """
-        return None != self.edge_weights and len(self.edge_weights) > 0
-	
-    def hasVertexColors(self):
-        """
-        Returns true if this Graph object has any vertex colors set.
-        """
-        return None != self.vtx_colors and len(self.vtx_colors) > 0
-	
-    def hasEdgeColors(self):
-        """
-        Returns true if this Graph object has any edge colors set.
-        """
-        return None != self.edge_colors and len(self.edge_colors) > 0
-	
     def order(self):
         """
         Returns the order (number of vertices) of the graph.
@@ -93,6 +58,8 @@ class Graph:
         Returns the size (number of edges) of the graph.
         """
         return len(self.edges)
+    
+    # ------------------------------ vertex degrees
     
     def vertexDegree(self, vertex):
         """
@@ -108,7 +75,7 @@ class Graph:
         Exception
             Throws exception for an out-of-range vertex index.
         """
-        if vertex <= 0 or vertex >= self.n:
+        if vertex < 0 or vertex >= self.n:
             raise Exception(f"Vertex index {vertex} out of range for graph degree {self.n}")
         if vertex in self.degree_cache.keys():
             return self.degree_cache[vertex]
@@ -237,9 +204,9 @@ class Graph:
             
     def sortEdges(self):
         """
-        Sort the list of edges. This should
-        be called any time the edge list is modified,
-        before any calculations that rely on the edge list.
+        Sort the list of edges. This methdo should be called any time the 
+        edge list is modified, before any calculations that rely on the edge 
+        list.
         """
         self.edges.sort()
         
@@ -254,13 +221,12 @@ class Graph:
 
         Behaviors
         ---------
-        Decreases graph order by 1 and removes and edges
-        or other structures that were referencing vertex.
+        Decreases graph order by 1 and removes and edges or other structures 
+        that were referencing vertex.
         
-        Note that all index-based vertex references greater than
-        the one deleted will be degremented, e.g. if vertex is 5,
-        then after deletion the old vertex 6 will now be 5, old
-        7 will now be 6, etc.
+        Note that all index-based vertex references greater than the one 
+        deleted will be decremented, e.g. if vertex is 5, then after deletion 
+        the old vertex 6 will now be 5, old 7 will now be 6, etc.
         
         Raises
         ------
@@ -286,14 +252,14 @@ class Graph:
             self.deleteEdgeByIndex(ei)
         
         # delete any vertex label, shift higher keys down by 1
-        if len(self.vertex_labels) > 0:
-            if vertex in self.vertex_labels:
-                del self.vertex_labels[vertex]
+        if self.hasVertexLabels():
+            if vertex in self.vtx_labels:
+                del self.vtx_labels[vertex]
             # also shift keys of vertex labels
             for vOld in range(vertex+1, self.n):
-                if vOld in self.vertex_labels:
-                    self.vertex_labels[vOld-1] = self.vertex_labels[vOld]
-                    del self.vertex_labels[vOld]
+                if vOld in self.vtx_labels:
+                    self.vtx_labels[vOld-1] = self.vtx_labels[vOld]
+                    del self.vtx_labels[vOld]
         
         # now decrement any subsequent vertex references
         # in edges - also must decrement edge label keys
@@ -307,7 +273,7 @@ class Graph:
             if edge[1] > vertex:
                 self.edges[ei][1] = edge[1] - 1
                 edgeShifted = True
-            if edgeShifted and len(self.edge_labels) > 0:
+            if edgeShifted and self.hasEdgeLabels():
                 oldKey = str(edge)
                 if oldKey in self.edge_labels:
                     newKey = str(self.edges[ei])
@@ -372,8 +338,12 @@ class Graph:
             raise Exception(f"Invalid edge index: {ei}")
         
         edge = self.edges[ei]
-        if str(edge) in self.edge_labels:
-            del self.edge_labels[str(edge)]
+        if None == edge:
+            raise Exception(f"No edge found at index {ei}")
+        
+        if self.hasEdgeLabels():
+            if str(edge) in self.edge_labels:
+                del self.edge_labels[str(edge)]
         
         del self.edges[ei]
         
@@ -435,8 +405,8 @@ class Graph:
         
     def isComplete(self):
         """
-        Returns True if this is a complete graph (all vertices
-            adjacent to each other)
+        Returns True if this is a complete graph (all vertices adjacent to 
+        each other)
         """
         # fail fast: a complete graph needs n(n-1)/2
         numEdges = len(self.edges)
@@ -452,6 +422,11 @@ class Graph:
         return True 
     
     def complement(self):
+        """
+        Returns a new Graph object that is the complement of the current
+        graph, i.e., a graph of the same order with edges only between
+        vertices that are not adjacent in the current graph.
+        """
         comp = Graph(self.n)
         
         for i in range(0, self.n):
@@ -464,35 +439,30 @@ class Graph:
     
     def inducedSubgraph(self, vertices):
         """
-        Construct and return a new Graph that is isomorphic
-        to the subgraph induced on the list of vertices.
+        Construct and return a new Graph that is isomorphic to the subgraph 
+        induced on the list of vertices.
 
         Parameters
         ----------
         vertices : list of int
             The vertices used to induce the subgraph.
-
         
         Behavior
         --------
-        Note that the returned graph will *not* have identical
-        vertex-indices to the original graph in most cases;
-        vertex indicies are shifted to reflect the order of
-        the subgraph.
+        Note that the returned graph will *not* have identical vertex-indices 
+        to the original graph in most cases; vertex indicies are shifted to 
+        reflect the order of the subgraph.
         
-        For example if vertices 3, 4, 5 are supplied, the
-        resulting graph will have order 3 and vertex indicies
-        0, 1, 2, but the resulting edges will be isomorphic
-        (e.g. if original graph had an edge between 4 and 5,
-        induced subgraph will have an edge between 1 and 2).
+        For example if vertices 3, 4, 5 are supplied, the resulting graph 
+        will have order 3 and vertex indicies 0, 1, 2, but the resulting 
+        edges will be isomorphic (e.g. if original graph had an edge between 
+        4 and 5, the induced subgraph will have an edge between 1 and 2).
         
-        If the source graph is labeled, labels will be correctly
-        assigned to the induced subgraph (e.g. above if vertex
-        4 was labeled 'd', in the induced subgraph the corresponding
-        vertex 1 will be labeled 'd').
+        If the source graph is labeled, labels will be correctly assigned to 
+        the induced subgraph (e.g. above if vertex 4 was labeled 'd', in the 
+        induced subgraph the corresponding vertex 1 will be labeled 'd').
         
         Returns a new Graph object.
-        -------
         """
         
         vertices.sort()
@@ -526,54 +496,86 @@ class Graph:
             
         return sub
     
-    def adjacencyMatrix(self):
-        """
-        Returns an adjacency matrix for Graph, as a scipy.sparse.coo_matrix
-        """
-        iList = []
-        jList = []
-        
-        i = 0
-        j = 0
-        for i in range(0, self.n):
-            for j in range(i+1, self.n):
-                if self.hasEdge(i, j):
-                    iList.append(i)
-                    jList.append(j)
-                    
-                    iList.append(j)
-                    jList.append(i)
-        
-        return coo_matrix((np.ones(len(iList), dtype=int), (iList, jList)), shape=(self.n, self.n))
-        
+    # ------------------------------ vertex labels
     
-    def edgeVertexMatrix(self):
+    def hasVertexLabels(self):
         """
-        Returns an edge-vertex matrix for Graph (rows=edges, columns=vertices), as a scipy.sparse.coo_matrix.
+        Returns true if this Graph object has any vertex labels set.
         """
-        iList = []
-        jList = []
-        for i in range(0, len(self.edges)):
-            edge = self.edges[i]
-            iList.append(i)
-            jList.append(edge[0])
-            iList.append(i)
-            jList.append(edge[1])
-        return coo_matrix((np.ones(len(iList), dtype=int), (iList, jList)), shape=(len(self.edges), self.n))
+        if None == self.vtx_labels:
+            return False
+        return len(self.vtx_labels) > 0
+    
+    def clearVertexLabels(self):
+        """
+        Delete any existing vertex labels.
+        """
+        if self.hasVertexLabels():
+            del self.vtx_labels
+            self.vtx_labels = None
+            
+    def setVertexLabel(self, vertex, label):
+        if vertex < 0 or vertex >= self.n:
+            raise Exception("vertex out of range")
+            
+        if None == self.vtx_labels:
+            self.vtx_labels = {}
+        self.vtx_labels[vertex] = label
         
-    def incidenceMatrix(self):
+    def getVertexLabel(self, vertex):
+        if self.hasVertexLabels():
+            return self.vtx_labels[vertex]
+        return None
+        
+    # ------------------------------ edge labels
+    
+    def hasEdgeLabels(self):
         """
-        Returns an incidence matrix for Graph (rows=vertices, columns=edges), as a scipy.sparse.coo_matrix
+        Returns true if this Graph object has any edge labels set.
         """
-        return self.edgeVertexMatrix().transpose()
+        return None != self.edge_labels and len(self.edge_labels) > 0
+	
+    # ------------------------------ vertex weights
+    
+    def hasVertexWeights(self):
+        """
+        Returns true if this Graph object has any vertex weights set.
+        """
+        return None != self.vtx_weights and len(self.vtx_weights) > 0
+	
+    # ------------------------------ edge weights
+    
+    def hasEdgeWeights(self):
+        """
+        Returns true if this Graph object has any edge weights set.
+        """
+        return None != self.edge_weights and len(self.edge_weights) > 0
+	
+    # ------------------------------ vertex colors
+    
+    def hasVertexColors(self):
+        """
+        Returns true if this Graph object has any vertex colors set.
+        """
+        return None != self.vtx_colors and len(self.vtx_colors) > 0
+	
+    # ------------------------------ edge colors
+    
+    def hasEdgeColors(self):
+        """
+        Returns true if this Graph object has any edge colors set.
+        """
+        return None != self.edge_colors and len(self.edge_colors) > 0
+    
+    # ------------------------------ misc.
     
     def clearCaches(self):
         """
         Clear degree caches. 
         
-        Degree caches are used to avoid repeated calculation of
-        vertex degrees for a Graph that has not change. Typically the caches
-        are cleared with any change to edge list including vertex deletion etc.
+        Degree caches are used to avoid repeated calculation of vertex 
+        degrees for a Graph that has not changed. Typically the caches are 
+        cleared with any change to edge list, including vertex deletion etc.
         """
         self.degree_cache.clear()
         
