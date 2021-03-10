@@ -9,6 +9,13 @@ Created on Fri Mar  5 11:40:58 2021
 from graphoire.graph import Graph
 
 class Digraph(Graph):
+    """
+    Digraph is a subclass of Graph that implements edge direction.
+    This includes distinguishing between u,v and v,u edges (the
+    base class resolves such edges to u,v). The class also can
+    calculate in-degree and out-degree of vertices; note that the
+    base class vertexDegree() and related methods consider out-degree only.
+    """
     
     def __init__(self, n: int):
         Graph.__init__(self, n)

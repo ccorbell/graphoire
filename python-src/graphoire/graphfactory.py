@@ -138,4 +138,9 @@ class GraphFactory:
     def makeHypercube(k: int, label=False):
         pass
     
+    def makeMycielski(G: Graph):
+        pass
+    
+    
+    
     

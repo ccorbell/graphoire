@@ -12,7 +12,35 @@ from graphoire.labels import labelGraphVerticesWithIntegers
 import copy
 
 def createPruferCode(G:Graph):
-    # Make a copy of the graph that we can label and destroy
+    """
+    Create a Prüfer code for a given Graph object.
+
+    Parameters
+    ----------
+    G : a Graph object.
+
+    Raises
+    ------
+    Exception
+        Raises if the algorithm cannot find leaves, which may happen if the 
+        graph is not a tree.
+
+    Returns
+    -------
+    code : array of integer vertex label values
+
+    Behavior
+    --------
+    The algorithm creates a copy of the input graph on which it operates.
+    It first labels the graph using 1-based integer-value labels. Then
+    it applies the Prufer-code algorithm, finding lowest-label-valued leaf
+    and recording its neighbor's label, then deleting the leaf, etc.,
+    until only two vertices remain.
+    
+    So the return value is an integer sequence (returned as a python list)
+    built from one-based vertex labels.
+    """
+    # Make a copy of the graph that we can label and delete vertices
     Gcopy = copy.copy(G)
     
     # we need one-based integer-incrementing labels on all the vertices
@@ -29,8 +57,7 @@ def createPruferCode(G:Graph):
             leafLabel = Gcopy.getVertexLabel(leafIndex)
             if None == leafLabel:
                 raise Exception(f"Error, no leaf label found for leaf index {leafIndex}")
-            labelInt = int(leafLabel) # we need to sort on label as an integer
-            labelLeafTuples.append((labelInt, leafIndex))
+            labelLeafTuples.append((leafLabel, leafIndex))
             
         if len(labelLeafTuples) == 0:
             # Error - maybe the graph was not a tree?

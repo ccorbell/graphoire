@@ -33,7 +33,7 @@ class TestCreatePruferCode(unittest.TestCase):
         pcode = createPruferCode(tree)
         #print (pcode)
         
-        self.assertEqual(['2', '3', '4', '6', '7', '7', '9'], pcode)
+        self.assertEqual([2, 3, 4, 6, 7, 7, 9], pcode)
         # check that original tree is not changed
         self.assertEqual(9, tree.order())
         

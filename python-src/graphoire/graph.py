@@ -11,16 +11,17 @@ from scipy.sparse import coo_matrix
 
 class Graph:
     """
-    Graph is the set-theoretic graph class in graphworks.
-    A graph is implemented here as a set of (implied) vertices and a 
+    Graph is the set-theoretic graph class in grapoire.
+    
+    A Graph object is has as a set of (implied) vertices 0-n, and a 
     set of (explicit) edges that relate pairs of vertices by index reference.
     
     The class includes support for vertex and edge labels, 
-    vertex and edge weights, and coloring. The Diagraph subclass
+    vertex and edge weights, and coloring. The Digraph subclass
     adds support for edge direction.
     """
     
-    def __init__(self, n):
+    def __init__(self, n: int):
         """
         Create an empty graph of order n.
 
