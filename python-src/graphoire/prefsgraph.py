@@ -5,17 +5,20 @@ Created on Thu Feb 18 09:43:18 2021
 
 @author: Christopher Corbell
 
-PIn general the problem domain here is a bipartition
-where elements of one group have preferences for the other
-group. This may be an exhaustive ranking such as is used for
-stable matching problems, or sparser structures. 
+PrefsGraph is a bipartite-complete Digraph with weighted edges
+representing preferences.
 
-One way we represent a preference is a weighted edge,
-with a lower weight representing higher preference
-(shorter 'preference distance').
+Each partition is equivalent to one side of a preference
+matching graph for a stable-matching algorithm like
+Gale-Shapley.
+
 """
 
+from graphoire.digraph import Digraph
 
-
+class PrefsGraph(Digraph):
+    def __init__(self, n: int):
+        Digraph.__init__(self, n)
+        
 
 

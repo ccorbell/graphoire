@@ -9,6 +9,7 @@ Created on Sat Mar  6 16:18:44 2021
 import unittest
 
 from graphoire.graph import Graph
+from graphoire.graphfactory import GraphFactory
 
 def RunAllGraphTests():
     suite = unittest.TestSuite()
@@ -60,18 +61,92 @@ class TestGraphBasics(unittest.TestCase):
         self.assertEqual(1, G.vertexDegree(4))
         
     def testDegreeMin(self):
-        pass
+        G = Graph(5)
+        self.assertEqual(0, G.degreeMin())
+        
+        G.addEdge(0, 1)
+        G.addEdge(0, 2)
+        G.addEdge(0, 3)
+        self.assertEqual(0, G.degreeMin())
+        
+        G.addEdge(1, 3)
+        G.addEdge(2, 3)
+        G.addEdge(3, 4)
+        self.assertEqual(1, G.degreeMin())
+        
+        C8 = GraphFactory.makeCycle(8)
+        self.assertEqual(2, C8.degreeMin())
+        
+        K7 = GraphFactory.makeComplete(7)
+        self.assertEqual(6, K7.degreeMin())
+
     
     def testDegreeMax(self):
-        pass
-    
+        G = Graph(5)
+        self.assertEqual(0, G.degreeMax())
+        
+        G.addEdge(0, 1)
+        G.addEdge(0, 2)
+        G.addEdge(0, 3)
+        self.assertEqual(3, G.degreeMax())
+        
+        G.addEdge(1, 3)
+        G.addEdge(2, 3)
+        G.addEdge(3, 4)
+        self.assertEqual(4, G.degreeMax())
+        
+        C8 = GraphFactory.makeCycle(8)
+        self.assertEqual(2, C8.degreeMax())
+        
+        K7 = GraphFactory.makeComplete(7)
+        self.assertEqual(6, K7.degreeMax())
+        
+        
     def testDegreeSum(self):
-        pass
+        G = Graph(5)
+        self.assertEqual(0, G.degreeSum())
+        
+        G.addEdge(0, 1)
+        G.addEdge(0, 2)
+        G.addEdge(0, 3)
+        G.addEdge(1, 4)
+        G.addEdge(3, 4)
+        self.assertEqual(10, G.degreeSum())
+        
+        C8 = GraphFactory.makeCycle(8)
+        self.assertEqual(8 * 2, C8.degreeSum())
+        
+        K7 = GraphFactory.makeComplete(7)
+        self.assertEqual(7 * 6, K7.degreeSum())
+
     
     def testDegreeAvg(self):
-        pass
+        G = Graph(5)
+        self.assertEqual(0.0, G.degreeAvg())
+        
+        expected = [0, 0, 0, 0, 0]
+        self.assertEqual(expected, G.degreeSequence())
+        
+        G.addEdge(0, 1)
+        G.addEdge(0, 2)
+        G.addEdge(0, 3)
+        G.addEdge(1, 4)
+        G.addEdge(3, 4)
+        
+        expected = [3, 2, 2, 2, 1]
+        self.assertEqual(expected, G.degreeSequence())
+        
+        P4 = GraphFactory.makePath(4)
+        expected = [2, 2, 1, 1]
+        self.assertEqual(expected, P4.degreeSequence())
+        
+        Pet = GraphFactory.makePetersen()
+        expected = [3] * 10
+        self.assertEqual(expected, Pet.degreeSequence())
+        
     
     def testDegreeSequence(self):
+        
         pass
     
     def testHasEdge(self):

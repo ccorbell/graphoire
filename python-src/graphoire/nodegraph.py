@@ -8,15 +8,16 @@ Created on Sat Mar  6 18:43:19 2021
 
 
         
-class GWNode:
+class Node:
     """
-    GWNode represents a vertex in a linked-list graph implementation.
+    Node represents a vertex in a linked-list graph implementation.
     This is an alternative to set-theoretic graph representation
     used by GWGraph, or its related matrix representations.
     
-    GWNode is intended to be used for algorithms that are more
+    Node is intended to be used for algorithms that are more
     efficient when traversing a graph as a linked list rather
     than treating the set of vertices/edges or a matrix representation.
+    
     """
     def __init__(self, vtxref=None):
         self.vtxref = vtxref
@@ -24,11 +25,13 @@ class GWNode:
         self.label = None
         self.weight = None
         
-class GWEdge:
+class Edge:
     """
-    GWEdge represents an edge between two GWNode objects, for
+    Edge represents an edge between two Node objects, for
     a linked-list graph implementation.
     
+    If the graph is directed, then node0 is the tail
+    and node1 is the head.
     """
     def __init__(self):
         self.node0 = None
@@ -36,12 +39,12 @@ class GWEdge:
         self.label = None
         self.weight = None
 
-class GWNodeGraph:
+class NodeGraph:
     """
-    GWNodeGraph is a graph as a collection of linked nodes
+    NodeGraph is a graph as a collection of linked nodes
     and edges.
     """
     def __init__(self):
-        self.components = [] # list of disjoint GWNode graphs
+        self.components = [] # list of disjoint Node graphs
     
     

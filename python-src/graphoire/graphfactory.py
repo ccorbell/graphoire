@@ -114,17 +114,22 @@ class GraphFactory:
         """
         pet = GraphFactory.makeCycle(5)
         pet.n = 10
+
         secondCycle = []
         for edge in pet.edges:
             secondCycle.append([edge[0]+5, edge[1]+5])
         for edge in secondCycle:
-            pet.addEdge(edge)
+            pet.edges.append(edge)
             
         pet.addEdge(0, 5)
         pet.addEdge(2, 6)
         pet.addEdge(4, 7)
         pet.addEdge(1, 8)
         pet.addEdge(3, 9)
+        
+        pet.sortEdges()
+        
+        return pet
         
     #def makeRandomTree(n: int):
     #    tree = Graph(n)
