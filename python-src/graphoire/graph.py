@@ -186,6 +186,9 @@ class Graph:
         vertex order is significant, with v1 as head and v2 as tail.
 
         """
+        if v1 < 0 or v1 >= self.n or v2 < 0 or v2 >= self.n:
+            raise Exception("Vertex index out of range for addEdge()")
+            
         # Note undirected graph always puts lowest vertex first;
         # GWDigraph overrides this to treat i as head, j as tail
         v1st = v1

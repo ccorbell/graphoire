@@ -189,14 +189,113 @@ class TestGraphBasics(unittest.TestCase):
         self.assertFalse(G.hasEdge(1, 5))
     
     def testAddEdge(self):
-        pass
+        G = Graph(5)
+        self.assertEqual(0, G.edgeCount())
+        
+        # basic success
+        G.addEdge(2, 3)
+        self.assertEqual(1, G.edgeCount())
+        self.assertTrue(G.hasEdge(2, 3))
+        
+        # ignore out-of-range edge
+        caught = False
+        try:
+            G.addEdge(3, 20)
+        except:
+            caught = True
+        else:
+            self.fail("Did not get exception for out-of-range vertex")
+        self.assertTrue(caught)
+        
+        
+        self.assertEqual(1, G.edgeCount())
+        self.assertTrue(G.hasEdge(2, 3))
+        
+        # ignore redundant edge
+        G.addEdge(2, 3)
+        G.addEdge(3, 2)
+        self.assertEqual(1, G.edgeCount())
+        self.assertTrue(G.hasEdge(2, 3))
+        
+        # edge is inserted unsorted initially
+        G.addEdge(1, 2)
+        self.assertEqual(2, G.edgeCount())
+        self.assertEqual([2, 3], G.edges[0])
+        self.assertEqual([1, 2], G.edges[1])
+        
+        G.sortEdges()
+        self.assertEqual([1, 2], G.edges[0])
+        self.assertEqual([2, 3], G.edges[1])
+        
+        # test adding with sortEdges=True
+        G.addEdge(0, 2, True)
+        G.addEdge(0, 1, sortEdges=True)
+        self.assertEqual(4, G.edgeCount())
+        self.assertEqual([0, 1], G.edges[0])
+        self.assertEqual([0, 2], G.edges[1])
+        self.assertEqual([1, 2], G.edges[2])
+        self.assertEqual([2, 3], G.edges[3])
+        
     
     def testSortEdges(self):
-        pass
-    
+        G = Graph(5)
+        G.addEdge(4, 3)
+        G.addEdge(1, 2)
+        G.addEdge(3, 0)
+        
+        self.assertEqual([3, 4], G.edges[0])
+        self.assertEqual([1, 2], G.edges[1])
+        self.assertEqual([0, 3], G.edges[2])
+        
+        G.sortEdges()
+        self.assertEqual([3, 4], G.edges[2])
+        self.assertEqual([1, 2], G.edges[1])
+        self.assertEqual([0, 3], G.edges[0])
+        
     def testDeleteVertex(self):
-        pass
-    
+        # case 1: delete vertex of empty graph
+        G = Graph(10)
+        self.assertEqual(10, G.order())
+        self.assertEqual(0, G.edgeCount())
+        G.deleteVertex(3)
+        self.assertEqual(9, G.order())
+        
+        # case 2: delete last vertex of a path
+        G = GraphFactory.makePath(5)
+        self.assertEqual(5, G.order())
+        self.assertEqual(4, G.edgeCount())
+        G.deleteVertex(4)
+        self.assertEqual(4, G.order())
+        self.assertEqual(3, G.edgeCount())
+        self.assertTrue(G.hasEdge(0, 1))
+        self.assertTrue(G.hasEdge(1, 2))
+        self.assertTrue(G.hasEdge(2, 3))
+        self.assertFalse(G.hasEdge(3, 4))
+        
+        # case 3: delete middle vertex of a path
+        G = GraphFactory.makePath(7)
+        self.assertEqual(7, G.order())
+        self.assertEqual(6, G.edgeCount())
+        G.deleteVertex(3)
+        self.assertEqual(6, G.order())
+        self.assertEqual(4, G.edgeCount())
+        self.assertTrue(G.hasEdge(0, 1))
+        self.assertTrue(G.hasEdge(1, 2))
+        self.assertFalse(G.hasEdge(2, 3))
+        self.assertTrue(G.hasEdge(3, 4))
+        self.assertTrue(G.hasEdge(4, 5))
+        self.assertFalse(G.hasEdge(5, 6))
+  
+        # case 4: delete vertex from a complete graph
+        G = GraphFactory.makeComplete(5)
+        self.assertEqual(5, G.order())
+        self.assertTrue(4, G.degreeMin())
+        self.assertTrue(4, G.degreeMax())
+        G.deleteVertex(1)
+        self.assertEqual(4, G.order())
+        self.assertTrue(3, G.degreeMin())
+        self.assertTrue(3, G.degreeMax())
+        
     def testDeleteEdge(self):
         pass
     
