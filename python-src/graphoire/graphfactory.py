@@ -7,6 +7,7 @@ Created on Sat Mar  6 10:07:28 2021
 """
 
 from graphoire.graph import Graph
+import copy
 
 class GraphFactory:
     def makeEmpty(n: int):
@@ -130,7 +131,8 @@ class GraphFactory:
         
         
     def makeGrotzsch():
-        pass
+        C5 = GraphFactory.makeCycle(5)
+        return GraphFactory.makeMycielski(C5)
         
     def makeHarley(m: int, n: int):
         pass
@@ -139,7 +141,23 @@ class GraphFactory:
         pass
     
     def makeMycielski(G: Graph):
-        pass
+        M = copy.copy(G)
+        # Add n + 1 vertices (u's, and w)
+        M.n = 2*G.n + 1
+        
+        # add edges from u to v-neighors
+        for vi in range(0, G.n):
+            ui = vi + G.n
+            vNeighbors = G.getNeighbors(vi)
+            for vN in vNeighbors:
+                M.addEdge(ui, vN)
+                
+        w = M.n
+        for ui in range(G.n, 2 * G.n):
+            M.addEdge(ui, w)
+            
+        return M
+        
     
     
     
