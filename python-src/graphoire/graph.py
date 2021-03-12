@@ -159,8 +159,9 @@ class Graph:
         if not self.directed:
             if v1st > v2nd:
                 v1st = v2
-                v2nd = v2
+                v2nd = v1
             
+        #print(f"DEBUG - checking for edge {[v1st, v2nd]}")
         if [v1st, v2nd] in self.edges:
             return True
         return False

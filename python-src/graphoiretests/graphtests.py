@@ -122,6 +122,24 @@ class TestGraphBasics(unittest.TestCase):
     
     def testDegreeAvg(self):
         G = Graph(5)
+        self.assertEqual(0, G.degreeSum())
+        
+        G.addEdge(0, 1)
+        G.addEdge(0, 2)
+        G.addEdge(0, 3)
+        G.addEdge(1, 4)
+        G.addEdge(3, 4)
+        self.assertEqual(2.0, G.degreeAvg())
+        
+        C8 = GraphFactory.makeCycle(8)
+        self.assertEqual(2.0, C8.degreeAvg())
+        
+        K7 = GraphFactory.makeComplete(7)
+        self.assertEqual(6.0, K7.degreeAvg())
+        
+    
+    def testDegreeSequence(self):
+        G = Graph(5)
         self.assertEqual(0.0, G.degreeAvg())
         
         expected = [0, 0, 0, 0, 0]
@@ -143,14 +161,32 @@ class TestGraphBasics(unittest.TestCase):
         Pet = GraphFactory.makePetersen()
         expected = [3] * 10
         self.assertEqual(expected, Pet.degreeSequence())
-        
-    
-    def testDegreeSequence(self):
-        
-        pass
     
     def testHasEdge(self):
-        pass
+        G = Graph(5)
+        self.assertEqual(0.0, G.degreeAvg())
+        
+        self.assertFalse(G.hasEdge(0, 1))
+        self.assertFalse(G.hasEdge(2, 3))
+        self.assertFalse(G.hasEdge(1, 4))
+        self.assertFalse(G.hasEdge(99, 101))
+        
+        G.addEdge(0, 1)
+        G.addEdge(0, 2)
+        G.addEdge(0, 3)
+        G.addEdge(1, 4)
+        G.addEdge(3, 4)
+        
+        self.assertTrue(G.hasEdge(0, 1))
+        self.assertTrue(G.hasEdge(1, 0))
+        
+        self.assertFalse(G.hasEdge(1, 3))
+        self.assertFalse(G.hasEdge(3, 1))
+        
+        self.assertTrue(G.hasEdge(3, 4))
+        self.assertTrue(G.hasEdge(4, 3))
+        
+        self.assertFalse(G.hasEdge(1, 5))
     
     def testAddEdge(self):
         pass
