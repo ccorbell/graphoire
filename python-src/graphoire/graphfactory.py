@@ -8,6 +8,7 @@ Created on Sat Mar  6 10:07:28 2021
 
 from graphoire.graph import Graph
 import copy
+import random
 
 class GraphFactory:
     def makeEmpty(n: int):
@@ -131,8 +132,33 @@ class GraphFactory:
         
         return pet
         
-    #def makeRandomTree(n: int):
-    #    tree = Graph(n)
+    def makeRandomTree(n: int, maxDegree=0):
+        usingMaxDegree = maxDegree >= 2
+        
+        tree = Graph(n)
+        isolated_v_set = [item for item in range(0, n)]
+        tree_v_set = []
+        
+        random.shuffle(isolated_v_set)
+        
+        # pick a vertex to start our tree from
+        tree_v_set.append(isolated_v_set.pop())
+        
+        # now add leaves to the tree until it's done
+        while len(isolated_v_set) > 0:
+            nextLeaf = isolated_v_set.pop()
+            leafNeighbor = random.choice(tree_v_set)
+            
+            tree.addEdge(nextLeaf, leafNeighbor, sortEdges=usingMaxDegree)
+            tree_v_set.append(nextLeaf)
+            
+            if usingMaxDegree:
+                deg = tree.vertexDegree(leafNeighbor)
+                if deg >= maxDegree:
+                    tree_v_set.remove(leafNeighbor)
+        
+        tree.sortEdges()
+        return tree
         
         
     def makeGrotzsch():
