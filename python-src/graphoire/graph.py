@@ -269,21 +269,36 @@ class Graph:
         # now decrement any subsequent vertex references
         # in edges - also must decrement edge label keys
         for ei in range(0, len(self.edges)):
-            edge = self.edges[ei].copy()
-            
-            edgeShifted = False
+            edge = self.edges[ei].copy() # review, is copy really needed?
+
             if edge[0] > vertex:
                 self.edges[ei][0] = edge[0] - 1
-                edgeShifted = True
             if edge[1] > vertex:
                 self.edges[ei][1] = edge[1] - 1
-                edgeShifted = True
-            if edgeShifted and self.hasEdgeLabels():
-                oldKey = str(edge)
-                if oldKey in self.edge_labels:
-                    newKey = str(self.edges[ei])
-                    self.edge_labels[newKey] = self.edge_labels[oldKey]
-                    del self.edge_labels[oldKey]
+                
+        if self.hasEdgeLabels():
+            newEdgeLabels = {}
+            for key, value in self.edge_labels.items():
+                key0 = key[0]
+                key1 = key[1]
+                if key0 >= vertex:
+                    key0 -= 1
+                if key1 >= vertex:
+                    key1 -= 1
+                newEdgeLabels[(key0, key1)] = value
+            self.edge_labels = newEdgeLabels
+        
+        if self.hasEdgeWeights():
+            newEdgeWeights = {}
+            for key, value in self.edge_weights.items():
+                key0 = key[0]
+                key1 = key[1]
+                if key0 >= vertex:
+                    key0 -= 1
+                if key1 >= vertex:
+                    key1 -= 1
+                newEdgeWeights[(key0, key1)] = value
+            self.edge_weights = newEdgeWeights
         
         # decrement graph order
         self.n -= 1
@@ -347,8 +362,12 @@ class Graph:
             raise Exception(f"No edge found at index {ei}")
         
         if self.hasEdgeLabels():
-            if str(edge) in self.edge_labels:
-                del self.edge_labels[str(edge)]
+            if (edge[0], edge[1]) in self.edge_labels:
+                del self.edge_labels[(edge[0], edge[1])]
+                
+        if self.hasEdgeWeights():
+            if (edge[0], edge[1]) in self.edge_weights:
+                del self.edge_weights[(edge[0], edge[1])]
         
         del self.edges[ei]
         
@@ -371,8 +390,12 @@ class Graph:
         for edge in self.edges:
             if vertex in edge:
                 retEdges.append(edge)
-            elif edge[0] > vertex:
-                break
+            else:
+                if not self.directed:
+                    # optimization for sorted edges of undirected graphs -
+                    # once we're past our vertex in edge-position 0 we're done
+                    if edge[0] > vertex:
+                        break
         return retEdges
     
     def getNeighbors(self, vertex):
@@ -392,10 +415,12 @@ class Graph:
                 neighbors.append(edge[1])
             elif edge[1] == vertex:
                 neighbors.append(edge[0])
-            elif edge[0] > vertex:
-                # sorting means we won't find
-                # any more neighbors
-                break
+            else:
+                if not self.directed:
+                    if edge[0] > vertex:
+                        # when undirected, sorting means we won't find
+                        # any more neighbors
+                        break
         return neighbors
     
     def isEven(self):
@@ -494,8 +519,8 @@ class Graph:
             newEdge = [vtxMap[inducedEdge[0]], vtxMap[inducedEdge[1]]]
             
             if self.hasEdgeLabels():
-                if str(inducedEdge) in self.edge_labels:
-                    sub.edge_labels[str(newEdge)] = self.edge_labels[str(inducedEdge)]
+                if (inducedEdge[0], inducedEdge[1]) in self.edge_labels:
+                    sub.edge_labels[(newEdge[0], newEdge[1])] = self.edge_labels[(inducedEdge[0], inducedEdge[1])]
                     
             sub.edges.append(newEdge)
             
@@ -531,6 +556,14 @@ class Graph:
         if self.hasVertexLabels():
             return self.vtx_labels[vertex]
         return None
+    
+    def getVertexByLabel(self, label):
+        for key, value in self.vtx_labels.items():
+            if value == label:
+                return key
+        # Note if we do this a lot and want to optimize
+        # for performance (but not memory) we could have
+        # a reverse dictionary cached
         
     # ------------------------------ edge labels
     
@@ -585,7 +618,11 @@ class Graph:
         self.degree_cache.clear()
         
     def __repr__(self):
-        gstr = "Graph"
+        gstr = type(self).__name__
+        if self.directed:
+            gstr += "(directed)"
+        else:
+            gstr += "(undirected)"
         gstr += "\n  n: " + str(self.n)
         gstr += "\n  edges: " + str(self.edges)
         if self.hasVertexLabels():
@@ -600,7 +637,6 @@ class Graph:
             gstr += "\n  vtx_colors: " + str(self.vtx_colors)
         if self.hasEdgeColors():
             gstr += "\n  edge_colors: " + str(self.edge_colors)
-        gstr += "\n"
         return gstr
 
     

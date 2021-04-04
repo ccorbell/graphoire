@@ -79,7 +79,65 @@ class Digraph(Graph):
         if self.hasVertexLabels():
 	        underG.vtx_labels = self.vtx_labels.copy()
         return underG
+    
+    def getOutNeighbors(self, vertex):
+        """
+        Get a list of vertices that this vertex connects-outward to.
 
+        Parameters
+        ----------
+        vertex : int
+            The vertex index
+
+        Returns list of adjacent head-vertex integer indices.
+        """
+        neighbors = []
+        for edge in self.edges:
+            if edge[0] == vertex:
+                neighbors.append(edge[1])
+        return neighbors
+    
+    def getInNeighbors(self, vertex):
+        """
+        Get a list of vertices that connect inward to this vertex.
+
+        Parameters
+        ----------
+        vertex : int
+            The vertex index
+
+        Returns list of adjacent tail-vertex integer indicdes.
+        """
+        neighbors = []
+        for edge in self.edges:
+            if edge[1] == vertex:
+                neighbors.append(edge[0])
+        return neighbors
+
+    def edgeDirection(self, tail, head):
+        """
+        Get the direction of edge between tail and head.
+
+        Parameters
+        ----------
+        tail : integer (vertex index)
+            The vertex to interpret as tail
+        head : integer (vertex index)
+            The vertex to interpret as head
+
+        Returns
+        -------
+        An integer value 1 if this is a directed edge from
+        tail to head, -1 if the edge is the other direction,
+        and 0 if there is no edge.
+        """
+        if self.hasEdge(tail, head):
+            return 1
+        elif self.hasEdge(head, tail):
+            return -1
+        else:
+            return 0
+        
     def clearCaches(self):
         self.indegree_cache.clear()
         Graph.clearCaches(self)

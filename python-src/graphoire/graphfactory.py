@@ -76,29 +76,25 @@ class GraphFactory:
         """
         Return a 5-vertex 'house' Graph.
         """
-        house = GraphFactory.makeCycle(4)
-        house.n = 5
-        house.addEdge(0, 4)
-        house.addEdge(1, 4)
+        house = GraphFactory.makeCycle(5)
+        house.addEdge(0, 2, True)
         return house
     
     def makeClaw():
         """
         Return a 4-vertex 'claw' Graph.
         """
-        claw = GraphFactory.makePath(3)
-        claw.n = 4
-        claw.addEdge(1, 3)
-        return claw
+        return GraphFactory.makeBipartiteComplete(3, 1)
     
     def makeBowtie():
         """
         Return a 5-vertex 'bowtie' Graph.
         """
-        bowtie = GraphFactory.makeComplete(3)
+        bowtie = GraphFactory.makeBipartiteComplete(3)
         bowtie.n = 5
-        bowtie.addEdge(1,3)
-        bowtie.addEdge(1,4)
+        bowtie.addEdge(1, 3)
+        bowtie.addEdge(1, 4)
+        bowtie.addEdge(3, 4, True)
         return bowtie
     
     def makeKite():
@@ -106,7 +102,7 @@ class GraphFactory:
         Return a 4-vertex 'kite' Graph.
         """
         kite = GraphFactory.makeCycle(4)
-        kite.addEdge(0, 2)
+        kite.addEdge(0, 2, True)
         return kite
         
     def makePetersen():
@@ -186,7 +182,7 @@ class GraphFactory:
         w = M.n
         for ui in range(G.n, 2 * G.n):
             M.addEdge(ui, w)
-            
+        M.sortEdges()
         return M
         
     

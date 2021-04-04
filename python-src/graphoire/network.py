@@ -21,22 +21,53 @@ class Network(Digraph):
         self.sink = sink
         self.edge_weights = {}
         
+    def __repr__(self):
+        nstr = Digraph.__repr__(self)
+        nstr += f"\n.source: {self.source} .sink: {self.sink}"
+        return nstr
+        
     def addNetworkEdge(self, tail: int, head: int, capacity: int):
         self.addEdge(tail, head)
         if None == self.edge_weights:
             self.edge_weights = {}
-        self.edge_weights[str([tail, head])] = capacity
+        self.edge_weights[(tail, head)] = capacity
         
     def getEdgeCapacity(self, tail: int, head: int):
-        key = str([tail, head])
+        if not self.hasEdge(tail, head):
+            return 0
+        
+        key = (tail, head)
         if key in self.edge_weights:
             return self.edge_weights[key]
-        return None
+        print (f"WARNING: capacity requested for unknown edge {key}")
+        return 0
     
     def setEdgeCapacity(self, tail: int, head: int, capacity: int):
-        edge = [tail, head]
-        if edge in self.edges:
-            self.edge_weights[str(edge)] = capacity
+        key = (tail, head)
+        self.edge_weights[key] = capacity
             
-    
+    def deleteVertex(self, vertex):
+        
+        if vertex == self.source or vertex == self.sink:
+            raise Exception("Network object forbids deletion of source or sink vertex")
+        
+        # If vertex deleted has lower index then source and/or sink,
+        # their values need to be shifted
+        
+        newSource = None
+        newSink = None
+        if vertex < self.source:
+            newSource = self.source - 1
+        if vertex < self.sink:
+            newSink = self.sink - 1
+            
+        # Delete the vertex - this updates edges, weights, labels as well
+        Digraph.deleteVertex(self, vertex)
+        
+        # Update source/sink index values if needed
+        if None != newSource:
+            self.source = newSource
+        if None != newSink:
+            self.sink = newSink
+            
     

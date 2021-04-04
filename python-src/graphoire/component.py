@@ -90,7 +90,7 @@ def findComponents(G: Graph):
     
     while len(visited) < G.n:
         component = findComponentWithVertex(G, vCursor)
-        print(f"DEBUG - got component for vertex {vCursor}: {component}")
+        #print(f"DEBUG - got component for vertex {vCursor}: {component}")
         components.append(component)
         for v in component:
             visited.add(v)
@@ -121,6 +121,9 @@ def findComponentWithVertex(G: Graph, vertex: int):
 
     Returns a list of vertex indices which are in the same component
     as the indicated vertex. The vertex-index-list is sorted ascending.
+    
+    Note this works the same for undirected and directed graphs,
+    edge direction does not matter in determining component.
     """
     componentSet = set()
     componentSet.add(vertex)
