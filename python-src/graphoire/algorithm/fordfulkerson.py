@@ -28,7 +28,7 @@ class FeasiblePath:
     def __repr__(self):
         return f"FeasiblePath .tolerance={self.tolerance} .vertices={self.vertices}"
     
-    def numPaths(self):
+    def numEdges(self):
         return len(self.vertices) - 1
     
     def getPathEdge(self, index):
@@ -132,8 +132,8 @@ class FordFulkerson:
                 break
             else:
                 # apply new path's tolerance to our flow
-                for pathIndex in range(0, fpath.numPaths()):
-                    pathEdge = fpath.getPathEdge(pathIndex)
+                for edgeIndex in range(0, fpath.numEdges()):
+                    pathEdge = fpath.getPathEdge(edgeIndex)
                     self.addEdgeFlow(pathEdge[0], pathEdge[1], fpath.tolerance)
 
         if not foundMaxFlow:
