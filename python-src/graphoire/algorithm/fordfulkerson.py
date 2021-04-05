@@ -61,10 +61,10 @@ class FordFulkerson:
     def zeroEdgeFlows(self):
         self.edgeFlows = {}
         for edge in self.network.edges:
-            self.edgeFlows[str(edge)] = 0
+            self.edgeFlows[(edge[0], edge[1])] = 0
             
     def getEdgeFlow(self, tail, head):
-        key = str([tail, head])
+        key = (tail, head)
         if key in self.edgeFlows:
             return self.edgeFlows[key]
         else:
@@ -81,7 +81,7 @@ class FordFulkerson:
             if flow > cap:
                 raise Exception(f"Illegal flow {flow} on edge ({tail},{head}) exceeds capacity {cap}")
                 
-        key = str([tail, head])
+        key = (tail, head)
         self.edgeFlows[key] = flow
         
     def addEdgeFlow(self, tail, head, value):

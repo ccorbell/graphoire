@@ -172,17 +172,19 @@ class TestFordFulkerson(unittest.TestCase):
         
         ff = FordFulkerson(network)
         self.assertEqual(7, len(ff.edgeFlows))
+        self.assertEqual(0, ff.getTotalFlow())
         
-        ff.edgeFlows[str([0, 1])] = 1
-        ff.edgeFlows[str([1, 2])] = 1
-        ff.edgeFlows[str([2, 3])] = 1
-        ff.edgeFlows[str([3, 4])] = 1
+        ff.edgeFlows[(0, 1)] = 1
+        ff.edgeFlows[(1, 2)] = 1
+        ff.edgeFlows[(2, 3)] = 1
+        ff.edgeFlows[(3, 4)] = 1
         
         self.assertEqual(7, len(ff.edgeFlows))
-        
+        self.assertEqual(1, ff.getTotalFlow())
         
         ff.zeroEdgeFlows()
         self.assertEqual(7, len(ff.edgeFlows))
+        self.assertEqual(0, ff.getTotalFlow())
         
 if __name__ == "__main__":
     fordfulkersontests_main()
