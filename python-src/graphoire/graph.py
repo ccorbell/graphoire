@@ -438,10 +438,8 @@ class Graph:
         Returns True if this is a complete graph (all vertices adjacent to 
         each other)
         """
-        # fail fast: a complete graph needs n(n-1)/2
+        #  a complete graph needs n(n-1)/2
         numEdges = len(self.edges)
-        if numEdges < self.n:
-            return False
         expected = self.n * (self.n - 1) / 2
         if numEdges != expected:
             return False

@@ -8,8 +8,11 @@ Created on Sat Mar  6 16:18:44 2021
 
 import unittest
 
+import copy
+
 from graphoire.graph import Graph
 from graphoire.graphfactory import GraphFactory
+from graphoire.component import isConnected
 
 def RunAllGraphTests():
     suite = unittest.TestSuite()
@@ -297,19 +300,96 @@ class TestGraphBasics(unittest.TestCase):
         self.assertTrue(3, G.degreeMax())
         
     def testDeleteEdge(self):
-        pass
+        G = GraphFactory.makeRandomTree(12)
+        startEdgeCount = G.edgeCount()
+        startOrder = G.order()
+        
+        self.assertTrue(isConnected(G))
+        randomEdge = copy.deepcopy(G.edges[2])
+        G.deleteEdge(randomEdge)
+        
+        self.assertEqual(startOrder, G.order())
+        self.assertEqual(startEdgeCount - 1, G.edgeCount())
+        self.assertFalse(isConnected(G))
     
     def testGetEdgesForVertex(self):
-        pass
+        G = GraphFactory.makeCycle(5)
+        edges = G.getEdgesForVertex(2)
+        self.assertEqual(2, len(edges))
+        self.assertTrue([1, 2] in edges)
+        self.assertTrue([2, 3] in edges)
+        
+        G = GraphFactory.makeComplete(10)
+        edges = G.getEdgesForVertex(5)
+        self.assertEqual(9, len(edges))
+        self.assertTrue([1, 5] in edges)
+        self.assertTrue([3, 5] in edges)
+        self.assertTrue([5, 6] in edges)
+        self.assertTrue([5, 8] in edges)
+        self.assertTrue([5, 9] in edges)
     
     def testGetNeighbors(self):
-        pass
+        G = GraphFactory.makePath(7)
+        neighbors = G.getNeighbors(4)
+        self.assertEqual(2, len(neighbors))
+        self.assertTrue(3 in neighbors)
+        self.assertTrue(5 in neighbors)
+        
+        G = GraphFactory.makePetersen()
+        neighbors = G.getNeighbors(0)
+        self.assertEqual(3, len(neighbors))
     
     def testIsEven(self):
-        pass
+        G = GraphFactory.makePath(5)
+        self.assertFalse(G.isEven())
+        
+        G = GraphFactory.makeCycle(5)
+        self.assertTrue(G.isEven())
+        
+        G.deleteEdge([1, 2])
+        self.assertFalse(G.isEven())
+        
+        G = GraphFactory.makeRandomTree(12)
+        self.assertFalse(G.isEven())
+        
+        G = GraphFactory.makePetersen()
+        self.assertFalse(G.isEven())
+        
+        G = GraphFactory.makeComplete(7)
+        self.assertTrue(G.isEven())
+        G.deleteVertex(6)
+        self.assertFalse(G.isEven())
+        G.deleteVertex(5)
+        self.assertTrue(G.isEven())
+        G.deleteEdge([0, 1])
+        self.assertFalse(G.isEven())
+        
     
     def testIsComplete(self):
-        pass
+        G = GraphFactory.makeEmpty(5)
+        self.assertFalse(G.isComplete())
+        
+        G = GraphFactory.makePath(2)
+        self.assertTrue(G.isComplete())
+        
+        G = GraphFactory.makePath(3)
+        self.assertFalse(G.isComplete())
+        
+        G = GraphFactory.makeCycle(3)
+        self.assertTrue(G.isComplete())
+        
+        G = GraphFactory.makeCycle(4)
+        self.assertFalse(G.isComplete())
+        
+        G = GraphFactory.makeComplete(4)
+        self.assertTrue(G.isComplete())
+        G.deleteEdge([2,3])
+        self.assertFalse(G.isComplete())
+        G.deleteVertex(3)
+        self.assertTrue(G.isComplete())
+        
+        G = GraphFactory.makeRandomTree(12)
+        self.assertFalse(G.isComplete())
     
 class TestGraphConstructions(unittest.TestCase):
     
