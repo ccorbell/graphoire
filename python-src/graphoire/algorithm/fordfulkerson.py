@@ -48,7 +48,6 @@ class FordFulkerson:
         self.edgeFlows = {}
         self.R = [network.source]
         self.S = []
-        self.cutNodes = []
         self.zeroEdgeFlows()
         self.enforceConstraints = False
         self.maxIterations = 1000
@@ -57,7 +56,6 @@ class FordFulkerson:
         s = "FordFulkerson\n"
         s += f".network:(\n  {self.network}\n)\n"
         s += f".edgeFlows: {self.edgeFlows}\n"
-        s += f".cutNodes: {self.cutNodes}"
         return s
         
     def zeroEdgeFlows(self):
@@ -124,7 +122,6 @@ class FordFulkerson:
             iteration += 1
             self.R = [self.network.source]
             self.S = []
-            self.cutNodes = []
             
             fpath = self.findAugmentingPath()
             if None == fpath:
@@ -164,10 +161,6 @@ class FordFulkerson:
                     
                     if adjVtx == self.network.sink:
                         reachedSink = True
-            else:
-                # No adjacent tolerances here, add this vertex to our cutNodes
-                if not nextVertex in self.cutNodes:
-                    self.cutNodes.append(nextVertex)
                     
         if True == reachedSink:
             # form a path from our edges connected to sink
