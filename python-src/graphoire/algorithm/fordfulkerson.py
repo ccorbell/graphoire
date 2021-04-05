@@ -204,7 +204,7 @@ class FordFulkerson:
         inNeighbors = self.network.getInNeighbors(vtx)
         for inNeighbor in inNeighbors:
             if not inNeighbor in self.S: # don't check searched vertices
-                tol = self.getReverseEdgeTolerance(inNeighbor, vtx)
+                tol = self.getReverseEdgeTolerance(vtx, inNeighbor)
                 if tol > 0:
                     if not inNeighbor in self.R: # mark as reached
                         self.R.append(inNeighbor)
@@ -216,7 +216,41 @@ class FordFulkerson:
             self.S.append(vtx)
             
         return foundEdgeTolerances
+     
+    def findMinimumCutEdges(self):
+        # Find earliest edges at full capacity when traversing from source
+        tempR = [self.network.source]
+        tempS = []
         
+        cutEdges = []
+
+        while len(tempR) > 0:
+            vtx = tempR.pop()
+            
+            if vtx in tempS:
+                continue # already searched
+                
+            outNeighbors = self.network.getOutNeighbors(vtx)
+            for outNeighbor in outNeighbors:
+                if not outNeighbor in tempS: # don't check searched vertices
+                    tol = self.getEdgeTolerance(vtx, outNeighbor)
+                    if tol == 0:
+                        cutEdges.append([vtx, outNeighbor])
+                    else:
+                        tempR.append(outNeighbor)
+            tempS.append(vtx)
+        
+        # remove any edges that have both vertices in tempS
+        rmEdges = []
+        for edge in cutEdges:
+            if edge[0] in tempS and edge[1] in tempS:
+                rmEdges.append(edge)
+        
+        for edge in rmEdges:
+            cutEdges.remove(edge)
+            
+        return cutEdges
+    
     def getTotalFlow(self):
         # total flow is calculated from inflows to sink
         flow = 0
@@ -225,72 +259,12 @@ class FordFulkerson:
             flow += self.getEdgeFlow(inNeighbor, self.network.sink)        
         return flow
     
-    def getCutFlow(self):
-        # Determine total flow by calculating our cut-edge flow -
-        # should be the same as found max-flow into sink
+    
+    def getMinimumCutFlow(self):
         
-        # Our cut nodes are the points where we hit no-tolerance-available
-        # in our algorithm
-        
-        # To determine the edge cuts from them, we need to know which
-        # outbound edges are going toward the sink (not back toward source.)
-        
-        # We determine this with a copy of our network, by labeling vertices
-        # and then actually performing a vertex-cut. In the modified graph
-        # we find which neighbors of the cut vertices are in the same component
-        # as the sink - these are the heads of our relevant cut-edges
-        
-        # Label original network vertices, get cut-node labels
-        labelGraphVerticesWithIntegers(self.network)
-        sinkLabel = self.network.getVertexLabel(self.network.sink)
-        cutNodeLabels = []
-        for cutNode in self.cutNodes:
-            cutNodeLabels.append(self.network.getVertexLabel(cutNode))
-        
-        # Copy the network
-        modNetwork = copy.deepcopy(self.network)
-        
-        # Now delete cut nodes - we need to use labels since vertex
-        # indices can shift with cuts
-        for cutLabel in cutNodeLabels:
-            cutVtx = modNetwork.getVertexByLabel(cutLabel)
-            modNetwork.deleteVertex(cutVtx)
-            
-        modSinkVtx = modNetwork.getVertexByLabel(sinkLabel)
-        if None == modSinkVtx:
-            # TODO: this could just mean that an edge cut is actually
-            # at the sink, this should be okay - just return
-            # edge flows into sink
-            raise Exception("Could not perform cut without removing sink vertex.")
-            
-        # Find component of cut network that contains sink
-        comps = findComponents(modNetwork)
-        sinkComp = None
-        for comp in comps:
-            if modSinkVtx in comp:
-                sinkComp = comp
-                break
-        if None == sinkComp:
-            raise Exception("After cut could not find component containing sink vertex.")
-        
-        cutForwardEdges = []
-        for cutNode in self.cutNodes:
-            outNeighbors = self.network.getOutNeighbors(cutNode)
-            for neighbor in outNeighbors:
-                if neighbor == self.network.sink:
-                    # edge directly to sink obviously counts 
-                    cutForwardEdges.append([cutNode, neighbor])
-                else:
-                    neighborLabel = self.network.getVertexLabel(neighbor)
-                    modVtx = modNetwork.getVertexByLabel(neighborLabel)
-                    if modVtx in sinkComp:
-                        # this is a forward edge
-                        cutForwardEdges.append([cutNode, neighbor])
-            
-        # we now have our source->sink traversing edges
-        # that flow into our cut points - total up their flows
+        cutEdges = self.findMinimumCutEdges()
         cutFlow = 0
-        for cutEdge in cutForwardEdges:
+        for cutEdge in cutEdges:
             cutFlow += self.getEdgeFlow(cutEdge[0], cutEdge[1])
         return cutFlow
         

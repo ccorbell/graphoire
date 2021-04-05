@@ -32,7 +32,7 @@ def fordfulkersontests_main():
 class TestFordFulkerson(unittest.TestCase):
     
     
-    def XtestWith432(self):
+    def testWith432(self):
         # make network with 9 vertices, s=0, t=8
         network = Network(9, 0, 8)
     
@@ -55,15 +55,18 @@ class TestFordFulkerson(unittest.TestCase):
         network.addNetworkEdge(7, 8, 12)
         
         ff = FordFulkerson(network)
-        print(ff)
+        #print(ff)
         
         foundFlow = ff.run()
-        print(ff)
+        #print(ff)
         
         self.assertTrue(foundFlow)
         totalFlow = ff.getTotalFlow()
-        cutFlow = ff.getCutFlow()
-        print (f"total flow: {totalFlow} cut flow: {cutFlow}")
+        
+        cutFlow = ff.getMinimumCutFlow()
+        
+        self.assertEqual(17, totalFlow)
+        self.assertEqual(17, cutFlow)        
             
     def testTrivial1_singlePath(self):
         network = Network(4, 0, 3)
@@ -79,7 +82,7 @@ class TestFordFulkerson(unittest.TestCase):
         
         self.assertTrue(foundFlow)
         self.assertEqual(2, ff.getTotalFlow())
-        self.assertEqual(2, ff.getCutFlow())        
+        self.assertEqual(2, ff.getMinimumCutFlow())        
     
     def testTrivial2_simpleCycle(self):
         network = Network(5, 0, 4)
@@ -97,9 +100,9 @@ class TestFordFulkerson(unittest.TestCase):
         
         self.assertTrue(foundFlow)
         self.assertEqual(2, ff.getTotalFlow())
-        self.assertEqual(2, ff.getCutFlow())  
+        self.assertEqual(2, ff.getMinimumCutFlow())  
     
-    def XtestTrivial3_K4(self):
+    def testTrivial3_K4_var1(self):
         network = Network(4, 0, 2)
         network.addNetworkEdge(0, 1, 3)
         network.addNetworkEdge(0, 2, 1)
@@ -109,12 +112,33 @@ class TestFordFulkerson(unittest.TestCase):
         network.addNetworkEdge(3, 2, 3)
         
         ff = FordFulkerson(network)
+        #print(ff)
         foundFlow = ff.run()
+        #print(ff)
         self.assertTrue(foundFlow)
-        self.assertEqual(5, ff.getTotalFlow())
-        self.assertEqual(5, ff.getCutFlow())  
+        totalFlow = ff.getTotalFlow()
+        self.assertEqual(5, totalFlow)
+        cutFlow = ff.getMinimumCutFlow()
+        self.assertEqual(5, cutFlow)  
 
-    
+    def testTrivial3_K4_var2(self):
+        network = Network(4, 0, 2)
+        network.addNetworkEdge(0, 1, 4)
+        network.addNetworkEdge(0, 2, 1)
+        network.addNetworkEdge(0, 3, 1)
+        network.addNetworkEdge(1, 2, 1)
+        network.addNetworkEdge(1, 3, 2)
+        network.addNetworkEdge(3, 2, 3)
+        
+        ff = FordFulkerson(network)
+        #print(ff)
+        foundFlow = ff.run()
+        #print(ff)
+        self.assertTrue(foundFlow)
+        totalFlow = ff.getTotalFlow()
+        self.assertEqual(5, totalFlow)
+        cutFlow = ff.getMinimumCutFlow()
+        self.assertEqual(5, cutFlow)  
     
     def testSetEdgeFlow(self):
         network = Network(4, 0, 3)
