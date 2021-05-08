@@ -3,22 +3,64 @@
 """
 Created on Sun Feb 21 10:42:13 2021
 
-@author: mathaes
+@author: Christopher Corbell
 """
 
 import numpy as np
 from scipy.sparse import coo_matrix
 
+def vertexNeighborFromEdge(vertex, edge):
+    if vertex == edge[0]:
+        return edge[1]
+    elif vertex == edge[1]:
+        return edge[0]
+    return None
+
 class Graph:
     """
-    Graph is the set-theoretic graph class in grapoire.
+    Graph is the set-theoretic graph class in graphoire, and the primary
+    graph class used for library facilities and algorithms. This base
+    class is used to represent a simple undirected graph with no loops or
+    multiple edges.
     
-    A Graph object is has as a set of (implied) vertices 0-n, and a 
-    set of (explicit) edges that relate pairs of vertices by index reference.
+    A basic graph can be represented by an order, n, and a
+    set of edges as ordered pairs connecting vertices, the latter
+    represented by their index values (ranging from 0 to n-1).
+    So for example the 4-vertex path P4 is represented by n=4
+    and the edges [0, 1], [1, 2], [2, 3].
     
-    The class includes support for vertex and edge labels, 
-    vertex and edge weights, and coloring. The Digraph subclass
-    adds support for edge direction.
+    The Graph class supports optional dictionaries for vertex labels, weights,
+    and colors, and the same for edges.
+    
+    Vertex indices are semantically arbitrary but always contiguous.
+    A vertex deletion causes all vertices with higher indices to
+    be decremented - this is reflected in references to those vertices
+    in the edge set as well as in the optional label, weight, and/or
+    color dictionaries.
+    
+    Internally an undirected graph always stores edges with lower-valued
+    vertex index in the 0 or leftmost position of the pair. You can add
+    an edge from 9 to 5, but it will be stored internall as [5, 9] in this
+    class.
+    
+    The edge list should be kept sorted by calling sortEdges() after
+    changes are made, for efficient lookup and use by algorithms. Several 
+    Graph methods include a sortEdges parameter; providing True for this
+    parameter will trigger a sortEdges() call after the method is applied.
+    
+    A directed graph is implemented by the subclass Digraph, which
+    uses most of the base class facilities but permits both-direction
+    edges. Direction is defined there by vertex-pair order, and so Digraph 
+    does not force sorting on edge pair values the way this class does.
+    
+    Graphoire also supports two other graph representations: matrix
+    representations (adjacency, incidence, Laplacian, etc.), and also
+    tree-data-structure representation (with vertex objects linked by 
+    edge objects). See graphoire.matrix and graphoire.nodegraph for these
+    alternatives. 
+    
+    For graph drawing, see graphoire.drawing.
+    
     """
     
     def __init__(self, n: int):
@@ -46,6 +88,10 @@ class Graph:
         self.directed = False
         
         self.degree_cache = {}
+        
+        self.vertex_by_label_cache = None
+        self.edge_by_label_cache = None
+        
 	
     
     def order(self):
@@ -555,13 +601,23 @@ class Graph:
             return self.vtx_labels[vertex]
         return None
     
-    def getVertexByLabel(self, label):
-        for key, value in self.vtx_labels.items():
-            if value == label:
-                return key
-        # Note if we do this a lot and want to optimize
-        # for performance (but not memory) we could have
-        # a reverse dictionary cached
+    def getVertexByLabel(self, label, useCache=True):
+        if useCache:
+            if None == self.vertex_by_label_cache:
+                self.udpateVertexByLabelCache()
+            if label in self.vertex_by_label_cache:
+                return self.vertex_by_label_cache[label]
+            return None
+        else:
+            for key, value in self.vtx_labels.items():
+                if value == label:
+                    return key
+    
+    def updateVertexByLabelCache(self):
+        self.vertex_by_label_cache = dict([(value, key) for key, value in self.vtx_labels.items()])
+        
+    def clearVertexByLabelCache(self):
+        self.vertex_by_label_cache = None
         
     # ------------------------------ edge labels
     
@@ -586,6 +642,21 @@ class Graph:
         Returns true if this Graph object has any edge weights set.
         """
         return None != self.edge_weights and len(self.edge_weights) > 0
+    
+    def setEdgeWeight(self, v1, v2, weight):
+        if None == self.edge_weights:
+            self.edge_weights = {}
+        self.edge_weights[(v1, v2)] = weight
+        
+    def getEdgeWeight(self, v1, v2):
+        if None == self.edge_weights:
+            return None
+        
+        key = (v1, v2)
+        if key in self.edge_weights:
+            return self.edge_weights[key]
+        return None
+    
 	
     # ------------------------------ vertex colors
     
@@ -607,7 +678,7 @@ class Graph:
     
     def clearCaches(self):
         """
-        Clear degree caches. 
+        Clear internal caches. 
         
         Degree caches are used to avoid repeated calculation of vertex 
         degrees for a Graph that has not changed. Typically the caches are 

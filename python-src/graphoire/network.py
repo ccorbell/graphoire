@@ -28,23 +28,19 @@ class Network(Digraph):
         
     def addNetworkEdge(self, tail: int, head: int, capacity: int):
         self.addEdge(tail, head)
-        if None == self.edge_weights:
-            self.edge_weights = {}
-        self.edge_weights[(tail, head)] = capacity
+        self.setEdgeCapacity(tail, head, capacity)
         
     def getEdgeCapacity(self, tail: int, head: int):
         if not self.hasEdge(tail, head):
             return 0
         
-        key = (tail, head)
-        if key in self.edge_weights:
-            return self.edge_weights[key]
-        print (f"WARNING: capacity requested for unknown edge {key}")
-        return 0
+        cap = self.getEdgeWeight(tail, head)
+        if None == cap:
+            cap = 0
+        return cap
     
     def setEdgeCapacity(self, tail: int, head: int, capacity: int):
-        key = (tail, head)
-        self.edge_weights[key] = capacity
+        self.setEdgeWeight(tail, head, capacity)
             
     def deleteVertex(self, vertex):
         

@@ -9,6 +9,13 @@ Created on Sun Mar  7 19:28:04 2021
 from graphoire.graph import Graph
 import string
 
+def makeIncrementingLabelsWithPrefix(prefix, count, start=0):
+    labels = []
+    
+    for n in range(start, start+count):
+        labels.append(prefix + str(n))
+    return labels
+
 def labelGraphVerticesWithAlphas(G: Graph, lowercase=True):
     """
     Assign alphabetic labels to the graph vertices. If there are more than
