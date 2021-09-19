@@ -9,7 +9,7 @@ Created on Mon Mar  8 12:22:21 2021
 import unittest
 
 from graphoire.graphfactory import GraphFactory
-from graphoire.prufer import createPruferCode
+from graphoire.algorithm.prufer import createPruferCode
 
 def RunAllPruferTests():
     suite = unittest.TestSuite()

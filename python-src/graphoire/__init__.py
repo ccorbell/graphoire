@@ -5,13 +5,14 @@ Created on Sun Feb 21 10:22:57 2021
 
 @author: mathaes
 """
-__all__ = ["graph", "graphfactory", "digraph", "digraphfactory", "component", "labels","tree"]
+__all__ = ["graph", "graphfactory", "digraph", "digraphfactory", "block", "component", "labels","tree"]
 from graphoire.graph import Graph
 from graphoire.graphfactory import GraphFactory
 
 from graphoire.digraph import Digraph
 from graphoire.digraphfactory import DigraphFactory
 
+from graphoire.block import *
 from graphoire.component import *
 
 from graphoire.labels import *

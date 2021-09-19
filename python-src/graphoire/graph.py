@@ -648,14 +648,15 @@ class Graph:
             self.edge_weights = {}
         self.edge_weights[(v1, v2)] = weight
         
-    def getEdgeWeight(self, v1, v2):
+    def getEdgeWeight(self, v1, v2, default=None):
         if None == self.edge_weights:
-            return None
+            return default
         
         key = (v1, v2)
         if key in self.edge_weights:
             return self.edge_weights[key]
-        return None
+        
+        return default
     
 	
     # ------------------------------ vertex colors

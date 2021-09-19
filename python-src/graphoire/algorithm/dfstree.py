@@ -23,7 +23,7 @@ class DFSTreeVisitor:
         
 def dfstree(G: Graph, start=None, visitor=None, verbose=False):
     """
-    The defstree method does a depth-first search to find a spanning
+    The dfstree method does a depth-first search to find a spanning
     tree of the graph G starting at the indicated start vertex. 
     The spanning tree is returned as a set of edges.
     

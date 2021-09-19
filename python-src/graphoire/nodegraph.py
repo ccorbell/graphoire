@@ -18,6 +18,9 @@ class Node:
     efficient when traversing a graph as a linked list rather
     than treating the set of vertices/edges or a matrix representation.
     
+    Note that in terms of software, edges are also 'objects' in the
+    object graph; this is to permit either vertices or edges to be labeled,
+    weighted, etc.
     """
     def __init__(self, vtxref=None):
         self.vtxref = vtxref

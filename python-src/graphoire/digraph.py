@@ -4,6 +4,10 @@
 Created on Fri Mar  5 11:40:58 2021
 
 @author: Christopher Corbell
+
+Things we can use here:
+    - construct Digraph from underlying Graph (default direction for edges)
+    - DigraphFactory to construct some interesting digraphs
 """
 
 from graphoire.graph import Graph

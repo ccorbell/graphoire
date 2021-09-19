@@ -5,9 +5,15 @@ Created on Sat Mar  6 16:18:01 2021
 
 @author: mathaes
 """
-__all__ = ["diagraphtests", "fordfulkersontests", "graphtests", "graphfactorytests",
-           "networktests", "prufertests"]
+__all__ = ["adjacencytests",
+           "diagraphtests", 
+           "fordfulkersontests", 
+           "graphtests", 
+           "graphfactorytests",
+           "networktests", 
+           "prufertests"]
 
+from graphoiretests.adjacencytests import *
 from graphoiretests.digraphtests import *
 from graphoiretests.fordfulkersontests import *
 from graphoiretests.graphtests import *
