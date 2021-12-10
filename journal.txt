@@ -1,0 +1,6 @@
+graphoire development journal
+=============================
+
+This file is an informal journal of graphoire development research, design, and brainstorms. New entries will be at the top of this file.
+
+2021.10.21

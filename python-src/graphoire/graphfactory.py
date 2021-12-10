@@ -9,6 +9,7 @@ Created on Sat Mar  6 10:07:28 2021
 from graphoire.graph import Graph
 import copy
 import random
+import math
 
 class GraphFactory:
     def makeEmpty(n: int):
@@ -69,8 +70,71 @@ class GraphFactory:
                 bip.edges.append([i, j])
         return bip
         
-    def makeKPartiteComplete(sizelist):
-    	pass
+    def makeKPartiteComplete(partitionSizes):
+        order = sum(partitionSizes)
+        g = Graph(order)
+        
+        headCursor = 0
+        
+        for current_block in range(0, len(partitionSizes)):
+            current_block_size = partitionSizes[current_block]
+            for head in range(headCursor, headCursor + current_block_size):
+                tailCursor = 0
+                for tailBlock in range(0, len(partitionSizes)):
+                    blockSize = partitionSizes[tailBlock]
+                    
+                    if tailBlock == current_block:
+                        # skip all targets in current block
+                        tailCursor += blockSize
+                        continue
+                    else:
+                        for tail in range(tailCursor, tailCursor + blockSize):
+                            g.addEdge(head, tail)
+                        tailCursor += blockSize
+                        
+            headCursor += current_block_size
+            
+        return g
+            
+    
+    def makeTuranGraph(order, r):
+        """
+        Create a Turan graph, i.e., a multipartite
+        complete graph on n vertices with r partitions.
+
+        Parameters
+        ----------
+        order : int
+            The total number of vertices.
+        r : int
+            The number of partitions.
+
+        Returns
+        -------
+        A Graph object.
+
+        """
+        if r > order:
+            raise Exception("ERROR, makeTuranGraph requires order > r")
+            
+        sizeList = []
+        
+        rem = order % r
+        if 0 == rem:
+            sizeList = [int(order / r)] * r
+        else:
+        
+            avg = order / r
+            l_size = int(math.floor(avg))
+            u_size = l_size + 1
+            u_count = order - (l_size * r)
+            l_count = r - u_count
+            
+            sizeList = [l_size] * l_count
+            sizeList += [u_size] * u_count
+        
+        return GraphFactory.makeKPartiteComplete(sizeList)
+        
     
     def makeHouse():
         """

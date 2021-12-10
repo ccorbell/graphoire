@@ -23,24 +23,29 @@ class Graph:
     class is used to represent a simple undirected graph with no loops or
     multiple edges.
     
-    A basic graph can be represented by an order, n, and a
-    set of edges as ordered pairs connecting vertices, the latter
-    represented by their index values (ranging from 0 to n-1).
-    So for example the 4-vertex path P4 is represented by n=4
-    and the edges [0, 1], [1, 2], [2, 3].
+    The Graph class has an order, n, and an implied set of vertices
+    corresponding to the integer set [n]. For programming convenience,
+    these vertices are referred to by index (0 to n-1) rather than 1-based 
+    ordinal value; i.e. vertices are elements of the set {n-1: n in [n]}.
+    Edges are ordered pairs of vertex integer references.
+
+    So for example the 4-vertex path P4 is represented by n = 4
+    and the edges (0, 1), (1, 2), (2, 3).
     
     The Graph class supports optional dictionaries for vertex labels, weights,
     and colors, and the same for edges.
     
-    Vertex indices are semantically arbitrary but always contiguous.
-    A vertex deletion causes all vertices with higher indices to
+    In their set-theoretic form, as elements of [n]-1,
+    indices are semantically arbitrary but always contiguous.
+    
+    A vspecific vertex deletion causes all vertices with higher indices to
     be decremented - this is reflected in references to those vertices
     in the edge set as well as in the optional label, weight, and/or
     color dictionaries.
     
     Internally an undirected graph always stores edges with lower-valued
     vertex index in the 0 or leftmost position of the pair. You can add
-    an edge from 9 to 5, but it will be stored internall as [5, 9] in this
+    an edge from 9 to 5, but it will be stored internall as (5, 9) in this
     class.
     
     The edge list should be kept sorted by calling sortEdges() after
@@ -50,14 +55,15 @@ class Graph:
     
     A directed graph is implemented by the subclass Digraph, which
     uses most of the base class facilities but permits both-direction
-    edges. Direction is defined there by vertex-pair order, and so Digraph 
-    does not force sorting on edge pair values the way this class does.
+    edges. Direction in Digraph is defined by vertex-pair order, and so Digraph 
+    does not force ascendant order of each edge pair's index values the way 
+    this class does.
     
     Graphoire also supports two other graph representations: matrix
     representations (adjacency, incidence, Laplacian, etc.), and also
     tree-data-structure representation (with vertex objects linked by 
     edge objects). See graphoire.matrix and graphoire.nodegraph for these
-    alternatives. 
+    alternatives, and conversion between these types on this Graph class.
     
     For graph drawing, see graphoire.drawing.
     
@@ -200,17 +206,20 @@ class Graph:
         In a regular Graph order does not matter; in a Digraph,
         this will only find an edge with v1 as head, v2 as tail
         """
-        v1st = v1
-        v2nd = v2
-        if not self.directed:
-            if v1st > v2nd:
-                v1st = v2
-                v2nd = v1
-            
-        #print(f"DEBUG - checking for edge {[v1st, v2nd]}")
-        if [v1st, v2nd] in self.edges:
+        if self.canonicalizeEdge([v1, v2]) in self.edges:
             return True
         return False
+    
+    def canonicalizeEdge(self, edge):
+        v1st = edge[0]
+        v2nd = edge[1]
+        
+        if not self.directed:
+            # undirected edge needs to be sorted
+            if v1st > v2nd:
+                v1st = edge[1]
+                v2nd = edge[0]
+        return [v1st, v2nd]
     
     def addEdge(self, v1, v2, sortEdges=False):
         """
@@ -666,6 +675,38 @@ class Graph:
         Returns true if this Graph object has any vertex colors set.
         """
         return None != self.vtx_colors and len(self.vtx_colors) > 0
+    
+    def getVertexColor(self, vertex):
+        color = None
+        if self.hasVertexColors():
+            if vertex in self.vtx_colors.keys():
+                color = self.vtx_colors.get(vertex)
+        return color
+    
+    def setVertexColor(self, vertex, color):
+        if None == self.vtx_colors:
+            self.vtx_colors = {}
+        self.vtx_colors[vertex] = color
+        
+    def hasCompleteVertexColoring(self):
+        if not self.hasVertexColors():
+            return False
+        for vertex in range(0, self.n):
+            if None == self.getVertexColor(vertex):
+                return False
+        return True
+    
+    def getVertexesByColor(self, color):
+        results = []
+        if self.hasVertexColors():
+            for vertex in range(0, self.n):
+                vcolor = self.getVertexColor(vertex)
+                if vcolor == None:
+                    if color == None:
+                        results.append(vertex)
+                elif (color != None) and (vcolor == color):
+                    results.append(vertex)
+        return results
 	
     # ------------------------------ edge colors
     
@@ -674,6 +715,25 @@ class Graph:
         Returns true if this Graph object has any edge colors set.
         """
         return None != self.edge_colors and len(self.edge_colors) > 0
+    
+    def getEdgeColor(self, edge):
+        color = None
+        if self.hasVertexColors():
+            if vertex in self.vtx_colors.keys():
+                color = self.vtx_colors.get(vertex)
+        return color
+    
+    def setEdgeColor(self, edge, color):
+        return
+    
+    def hasCompleteEdgeColoring(self):
+        pass
+    
+    def getEdgesByColor(self, color):
+        results = []
+        
+        return results
+        
     
     # ------------------------------ misc.
     

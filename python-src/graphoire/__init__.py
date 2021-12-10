@@ -5,7 +5,7 @@ Created on Sun Feb 21 10:22:57 2021
 
 @author: mathaes
 """
-__all__ = ["graph", "graphfactory", "digraph", "digraphfactory", "block", "component", "labels","tree"]
+__all__ = ["graph", "graphfactory", "digraph", "digraphfactory", "block", "component", "labels", "numbers", "tree"]
 from graphoire.graph import Graph
 from graphoire.graphfactory import GraphFactory
 
@@ -18,6 +18,7 @@ from graphoire.component import *
 from graphoire.labels import *
 from graphoire.tree import *
 
+from graphoire.numbers import *
 
 """
 Things that would be interesting to implement:
