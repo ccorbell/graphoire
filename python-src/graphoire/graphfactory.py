@@ -10,6 +10,7 @@ from graphoire.graph import Graph
 import copy
 import random
 import math
+import itertools
 
 class GraphFactory:
     def makeEmpty(n: int):
@@ -173,6 +174,9 @@ class GraphFactory:
         """
         Return a 10-vertex Petersen Graph.
         """
+        return GraphFactory.makeKSubsetExclusionGraph(5, 2)
+    
+    def deprecated_makePetersen():
         pet = GraphFactory.makeCycle(5)
         pet.n = 10
 
@@ -191,6 +195,60 @@ class GraphFactory:
         pet.sortEdges()
         
         return pet
+    
+    def makeKSubsetExclusionGraph(n, k):
+        """
+        Considering the integer set [n], create vertices corresponding to
+        and labeled with every possible k-subset of [n], and
+        add an edge only between vertices whose subset-labels
+        are disjoint.
+        
+        Note that makeKSubsetExclusionGraph(5, 2) will
+        generate the Petersen graph, so this function can
+        be used to generate Petersen-like graphs based on
+        different n-sizes and subset sizes.
+        
+
+        Parameters
+        ----------
+        n : int
+            The maximum integer for the [n] set used; note this is not
+            the graph order
+        k : int
+            The size of subsets of [n] to use for vertex labels and 
+            edge-creation.
+
+        Returns
+        -------
+        A graph with the indicated properties, including labels corresponding
+        to subsets.
+        """
+        order = math.comb(n, k)
+        print (f"order is {order}")
+        
+        g = Graph(order)
+        
+        nset = list(range(1, n+1))
+        isubs = itertools.combinations(nset, k)
+        sublabels = list(isubs)
+        if len(sublabels) != order:
+            raise Exception(f"Unexpected combination count {len(sublabels)} for order {order}, n={n}, k={k}")
+                
+        for vertex in range(0, order):
+            g.setVertexLabel(vertex, sublabels[vertex])
+            
+        for head in range(0, order):
+            headLabel = g.getVertexLabel(head)
+            
+            for tail in range(0, order):
+                if tail == head:
+                    continue
+                tailLabel = g.getVertexLabel(tail)
+                if len(set(headLabel) & set(tailLabel)) == 0:
+                    print(f"Adding edge from {head} to {tail}, labels {headLabel}, {tailLabel}")
+                    g.addEdge(head, tail)
+                    
+        return g
         
     def makeRandomTree(n: int, maxDegree=0):
         usingMaxDegree = maxDegree >= 2

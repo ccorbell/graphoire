@@ -246,14 +246,7 @@ class Graph:
             
         # Note undirected graph always puts lowest vertex first;
         # GWDigraph overrides this to treat i as head, j as tail
-        v1st = v1
-        v2nd = v2
-        
-        if not self.directed:
-            if v1st > v2nd:
-                v1st = v2
-                v2nd = v1
-        edge = [v1st, v2nd]
+        edge = self.canonicalizeEdge([v1, v2])
         if not edge in self.edges:
             self.edges.append(edge)
         
@@ -375,16 +368,8 @@ class Graph:
         Exception
             If Graph does not contain indicated edge.
         """
-        v1st = edge[0]
-        v2nd = edge[1]
         
-        if not self.directed:
-            # undirected edge needs to be sorted
-            if v1st > v2nd:
-                v1st = edge[1]
-                v2nd = edge[0]
-        edge = [v1st, v2nd]
-        
+        edge = self.canonicalizeEdge(edge)
         ei = -1
         try:
             ei = self.edges.index(edge)
@@ -626,6 +611,7 @@ class Graph:
         self.vertex_by_label_cache = dict([(value, key) for key, value in self.vtx_labels.items()])
         
     def clearVertexByLabelCache(self):
+        del self.vertex_by_label_cache
         self.vertex_by_label_cache = None
         
     # ------------------------------ edge labels
@@ -636,6 +622,43 @@ class Graph:
         """
         return None != self.edge_labels and len(self.edge_labels) > 0
 	
+    def clearEdgeLabels(self):
+        if self.hasEdgeLabels():
+            del self.edge_labels
+            self.edge_labels = None
+            
+    def setEdgeLabel(self, edge, label):
+        edge = self.canonicalizeEdge(edge)
+        if None == self.edge_labels:
+            self.edge_labels = {}
+        self.edge_labels[edge] = label
+        
+    def getEdgeLabel(self, edge):
+        label = None
+        if self.hasEdgeLabels():
+            label = self.edge_labels.get(edge)
+        return label
+    
+    def getEdgeByLabel(self, label, useCache=True):
+        edge = None
+        if useCache:
+            if None == self.edge_by_label_cache:
+                self.updateEdgeByLabelCache()
+            edge = self.edge_by_label_cache.get(label)
+        else:
+            for key, value in self.edge_labels.items():
+                if value == label:
+                    edge = key
+        return edge
+        
+    def updateEdgeByLabelCache(self):
+        self.edge_by_label_cache = dict([(value, key) for key, value in self.vtx_labels.items()])
+        
+    def clearEdgeByLabelCache(self):
+        del self.edge_by_label_cache
+        self.edge_by_label_cache = None
+    
+    
     # ------------------------------ vertex weights
     
     def hasVertexWeights(self):
@@ -643,6 +666,19 @@ class Graph:
         Returns true if this Graph object has any vertex weights set.
         """
         return None != self.vtx_weights and len(self.vtx_weights) > 0
+    
+    def setVertexWeight(self, vertex, weight):
+        if None == self.vtx_weights:
+            self.vtx_weights = {}
+        self.vtx_weights[vertex] = weight
+        
+    def getVertexWeight(self, vertex):
+        weight = None
+        if self.hasVertexWeights():
+            weight = self.vtx_weights.get(vertex)
+        return weight
+    
+    
 	
     # ------------------------------ edge weights
     
