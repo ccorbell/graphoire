@@ -224,7 +224,7 @@ class GraphFactory:
         to subsets.
         """
         order = math.comb(n, k)
-        print (f"order is {order}")
+        #print (f"order is {order}")
         
         g = Graph(order)
         
@@ -245,7 +245,7 @@ class GraphFactory:
                     continue
                 tailLabel = g.getVertexLabel(tail)
                 if len(set(headLabel) & set(tailLabel)) == 0:
-                    print(f"Adding edge from {head} to {tail}, labels {headLabel}, {tailLabel}")
+                    #print(f"Adding edge from {head} to {tail}, labels {headLabel}, {tailLabel}")
                     g.addEdge(head, tail)
                     
         return g

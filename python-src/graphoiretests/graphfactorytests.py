@@ -12,6 +12,7 @@ from graphoire.graph import Graph
 from graphoire.graphfactory import GraphFactory
 from graphoire.component import isConnected
 from graphoire.tree import isTree
+import math
 
 def RunAllGraphFactoryTests():
     suite = unittest.TestSuite()
@@ -20,7 +21,7 @@ def RunAllGraphFactoryTests():
     runner = unittest.TextTestRunner()
     runner.run(suite)
     
-def Run1GraphBasicsTest(name):
+def Run1GraphFactoryTest(name):
     suite = unittest.TestSuite()
     suite.addTest(TestGraphFactory(name))
 
@@ -55,6 +56,23 @@ class TestGraphFactory(unittest.TestCase):
         self.assertFalse(isTree(C11))
         for vertex in range(0, C11.order()):
             self.assertEqual(2, C11.vertexDegree(vertex))
+            
+    def testMakeComplete(self):
+        K5 = GraphFactory.makeComplete(5)
+        self.assertEqual(5, K5.order())
+        self.assertEqual(10, K5.edgeCount())
+        self.assertTrue(isConnected(K5))
+        self.assertFalse(isTree(K5))
+        for vertex in range(0, K5.order()):
+            self.assertEqual(4, K5.vertexDegree(vertex))
+            
+        K17 = GraphFactory.makeComplete(17)
+        self.assertEqual(17, K17.order())
+        self.assertEqual(136, K17.edgeCount())
+        self.assertTrue(isConnected(K17))
+        self.assertFalse(isTree(K17))
+        for vertex in range(0, K17.order()):
+            self.assertEqual(16, K17.vertexDegree(vertex))    
     
     def testMakeBipartiteComplete(self):
         K_4_3 = GraphFactory.makeBipartiteComplete(4, 3)
@@ -72,9 +90,64 @@ class TestGraphFactory(unittest.TestCase):
             elif deg == 4:
                 degree_4_count += 1
             else:
-                self.fail("Found degree {deg} in bipartite graph, should only have 3 or 4")
+                self.fail(f"Found degree {deg} in bipartite graph, should only have 3 or 4")
         self.assertEqual(4, degree_3_count)
         self.assertEqual(3, degree_4_count)
+        
+    def testMakeKPartiteComplete(self):
+        K_5_3_2 = GraphFactory.makeKPartiteComplete([5, 3, 2])
+        self.assertEqual(5 + 3 + 2, K_5_3_2.order())
+        self.assertEqual(5*3 + 5*2 + 3*2, K_5_3_2.edgeCount())
+        self.assertEqual(5+3, K_5_3_2.degreeMax())
+        self.assertEqual(2+3, K_5_3_2.degreeMin())
+        self.assertEqual(5*(3+2) + 3*(5+2) + 2*(5+3), K_5_3_2.degreeSum())
+        deg_5_count = 0
+        deg_7_count = 0
+        deg_8_count = 0
+        for vertex in range(0, K_5_3_2.order()):
+            deg = K_5_3_2.vertexDegree(vertex)
+            if deg == 5:
+                deg_5_count += 1
+            elif deg == 7:
+                deg_7_count += 1
+            elif deg == 8:
+                deg_8_count += 1
+            else:
+                self.fail(f"Found degree {deg} in k-partite graph, expected 5, 7, or 8")
+        self.assertEqual(5, deg_5_count)
+        self.assertEqual(3, deg_7_count)
+        self.assertEqual(2, deg_8_count)
+        
+    def testMakeTuranGraph(self):
+        T_12_3 = GraphFactory.makeTuranGraph(12, 3)
+        self.assertEqual(12, T_12_3.order())
+        self.assertEqual(8, T_12_3.degreeMax())
+        self.assertEqual(8, T_12_3.degreeMin())
+        self.assertEqual((8 * 12) / 2, T_12_3.edgeCount())
+        
+        T_11_3 = GraphFactory.makeTuranGraph(11, 3)
+        self.assertEqual(11, T_11_3.order())
+        self.assertEqual(8, T_11_3.degreeMax())
+        self.assertEqual(7, T_11_3.degreeMin())
+        self.assertEqual((8*3 + 7*8) / 2, T_11_3.edgeCount())
+        
+        T_174_19 = GraphFactory.makeTuranGraph(174, 19)
+        self.assertEqual(174, T_174_19.order())
+        degreeCounts = {}
+        for vertex in range(0, T_174_19.order()):
+            deg = T_174_19.vertexDegree(vertex)
+            if deg in degreeCounts:
+                degreeCounts[deg] = degreeCounts[deg] + 1
+            else:
+                degreeCounts[deg] = 1
+        
+        self.assertEqual(2, len(degreeCounts))
+        self.assertTrue(164 in degreeCounts)
+        self.assertTrue(165 in degreeCounts)
+        self.assertEqual(degreeCounts[164] + degreeCounts[165], T_174_19.order())
+        degreeSum = 164 * degreeCounts[164] + 165 * degreeCounts[165]
+        self.assertEqual(degreeSum/2, T_174_19.edgeCount())
+
         
     def testMakeHouse(self):
         house = GraphFactory.makeHouse()
@@ -114,7 +187,40 @@ class TestGraphFactory(unittest.TestCase):
         self.assertEqual(3, degree_1_count)
         self.assertEqual(1, degree_3_count)
         
-    
+    def testMakePetersen(self):
+        pete = GraphFactory.makePetersen()
+        self.assertEqual(10, pete.order())
+        self.assertEqual(15, pete.edgeCount())
+        self.assertEqual(3, pete.degreeMin())
+        self.assertEqual(3, pete.degreeMax())
+        self.assertTrue(isConnected(pete))
+        
+        # we should have disjoint 2-subset labels on all connected vertices
+        for edge in pete.edges:
+            v0 = edge[0]
+            v1 = edge[1]
+            v0label = pete.getVertexLabel(v0)
+            v1label = pete.getVertexLabel(v1)
+            self.assertEqual(2, len(set(v0label)))
+            self.assertEqual(2, len(set(v1label)))
+            self.assertEqual(0, len(set(v0label) & set(v1label)))
+        #print(pete)
+        
+    def testMakeKSubsetExclusionGraph(self):
+        subexG = GraphFactory.makeKSubsetExclusionGraph(7, 3)
+        self.assertEqual(math.comb(7, 3), subexG.order())
+        self.assertEqual(4, subexG.degreeMin())
+        self.assertEqual(4, subexG.degreeMax())
+        
+        for edge in subexG.edges:
+            v0 = edge[0]
+            v1 = edge[1]
+            v0label = subexG.getVertexLabel(v0)
+            v1label = subexG.getVertexLabel(v1)
+            self.assertEqual(3, len(set(v0label)))
+            self.assertEqual(3, len(set(v1label)))
+            self.assertEqual(0, len(set(v0label) & set(v1label)))
+        #print(subexG)
         
     def testMakeRandomTree(self):
         
@@ -142,6 +248,7 @@ class TestGraphFactory(unittest.TestCase):
             deg = T25_max4.vertexDegree(vertex)
             self.assertTrue(deg > 0)
             self.assertTrue(deg <= 4)
+            
         
 if __name__ == "__main__":
     graphfactorytests_main()
