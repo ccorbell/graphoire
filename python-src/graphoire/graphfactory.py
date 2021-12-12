@@ -7,6 +7,8 @@ Created on Sat Mar  6 10:07:28 2021
 """
 
 from graphoire.graph import Graph
+from graphoire.labels import labelGraphVerticesWithBinaryStrings, binaryStringDigitDiff
+
 import copy
 import random
 import math
@@ -286,8 +288,44 @@ class GraphFactory:
     def makeHarley(m: int, n: int):
         pass
     
-    def makeHypercube(k: int, label=False):
-        pass
+    def makeHypercube(exponent: int, label=False):
+        """
+        Make the hypercube Q_(exponent), i.e., 
+        with order 2^(exponent)
+
+        Parameters
+        ----------
+        exponent : int (non-negative)
+            The power of 2, or subscript of Q, for the hypercube.
+
+        Returns
+        -------
+        A Graph object (the hypercube graph), with optional binary-string vertex labels
+
+        """
+        
+        if exponent < 0:
+            raise Exception("")
+        order = 2**exponent
+        hypercube = Graph(order)
+        if order == 1:
+            return hypercube
+
+        for head in range(0, order - 1):
+            for tail in range(head, order):
+                xor = head ^ tail
+                # if xor is a power of 2, these values differ in 1 bit
+                if xor and (not(xor & (xor - 1))):
+                    hypercube.addEdge(head, tail)
+
+    
+        # we use the binary-label approach to add edges, and return
+        # a graph with labels
+        if True == label:
+            labelGraphVerticesWithBinaryStrings(hypercube, exponent)
+                    
+        return hypercube
+        
     
     def makeMycielski(G: Graph):
         M = copy.copy(G)

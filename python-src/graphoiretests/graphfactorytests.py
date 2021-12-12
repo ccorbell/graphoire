@@ -12,6 +12,7 @@ from graphoire.graph import Graph
 from graphoire.graphfactory import GraphFactory
 from graphoire.component import isConnected
 from graphoire.tree import isTree
+from graphoire.labels import binaryStringDigitDiff
 import math
 
 def RunAllGraphFactoryTests():
@@ -166,6 +167,33 @@ class TestGraphFactory(unittest.TestCase):
                 self.fail("Found degree {deg} in house graph, should only have 2 or 3")
         self.assertEqual(3, degree_2_count)
         self.assertEqual(2, degree_3_count)
+        
+    def testMakeHypercube(self):
+        Q1 = GraphFactory.makeHypercube(1)
+        self.assertEqual(2, Q1.order())
+        self.assertEqual(1, Q1.edgeCount())
+        
+        Q2 = GraphFactory.makeHypercube(2)
+        self.assertEqual(4, Q2.order())
+        self.assertEqual(4, Q2.edgeCount())
+        
+        Q3 = GraphFactory.makeHypercube(3, True)
+        self.assertEqual(8, Q3.order())
+        self.assertEqual(12, Q3.edgeCount())
+        self.assertEqual('000', Q3.getVertexLabel(0))
+        self.assertEqual('001', Q3.getVertexLabel(1))
+        self.assertEqual('111', Q3.getVertexLabel(7))
+        for edge in Q3.edges:
+            v0label = Q3.getVertexLabel(edge[0])
+            v1label = Q3.getVertexLabel(edge[1])
+            diff = binaryStringDigitDiff(v0label, v1label)
+            self.assertEqual(1, diff)
+            
+        Q4 = GraphFactory.makeHypercube(4, True)
+        self.assertEqual(16, Q4.order())
+        
+        Q11 = GraphFactory.makeHypercube(11)
+        self.assertEqual(2**11, Q11.order())
     
         
     def testMakeClaw(self):

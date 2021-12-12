@@ -113,4 +113,35 @@ def labelGraphVerticesWithIntegerStrings(G: Graph, addValue=0):
     for vertex in range(0, G.order()):
         labelInt = vertex + addValue
         G.setVertexLabel(vertex, str(labelInt))
+        
+def labelGraphVerticesWithBinaryStrings(G: Graph, bits:int):
+    formatspec = f"0{bits}b"
+    for vertex in range(0, G.order()):
+        G.setVertexLabel(vertex, format(vertex, formatspec))
+            
     
+def binaryStringDigitDiff(binstr1, binstr2):
+    """
+    Count the number of digits that differ between two
+    same-length binary strings
+
+    Parameters
+    ----------
+    binstr1 : string
+        A binary (base-2) numeric string.
+    binstr2 : string
+        A binary (base-2) numeric string.
+
+    Returns
+    -------
+    An integer, the number of digits that differ between
+    the two strings.
+
+    """
+    digitDiff = 0
+    if not len(binstr1) == len(binstr2):
+        raise Exception("binaryStringDigitDiff requires arguments to have same length")
+    for n in range(0, len(binstr1)):
+        if binstr1[n] != binstr2[n]:
+            digitDiff += 1
+    return digitDiff
