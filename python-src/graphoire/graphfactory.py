@@ -72,6 +72,7 @@ class GraphFactory:
                 #print(f"DEBUG - appending edge ({i}, {j})")
                 bip.edges.append([i, j])
         return bip
+    
         
     def makeKPartiteComplete(partitionSizes):
         order = sum(partitionSizes)
@@ -345,6 +346,87 @@ class GraphFactory:
         M.sortEdges()
         return M
         
+    def makeVonNeumannLattice(rows:int, cols:int, toroidal:bool):
+        """
+        Make a graoh of rows x columns vertices that is is
+        internally 4-regular such that every vertex is in a
+        Von Neumann neighborhood. If toroidal is false, the
+        graph will have edges of degree-3 vertices and four
+        corners of degree-2 vertices. If toroidal is true,
+        the edges 'wrap around', so all vertices are degree 4.
+
+        Parameters
+        ----------
+        rows : int
+            DESCRIPTION.
+        cols : int
+            DESCRIPTION.
+        toroidal : bool
+            DESCRIPTION.
+
+        Returns
+        -------
+        graph : Graph
+            DESCRIPTION.
+
+        """
+        G = Graph(rows * cols)
+        
+        return Graph()
+        
+    def makeHexagonalLattice(rows:int, cols:int, toroidal:bool):
+        """
+        Make a graoh of rows x columns vertices that is is
+        internally 6-regular such that every internal vertex has six
+        neighbors. If toroidal is false, the graph is isomorphic
+        to a Hex game board, with edges of degree-4 vertices, two
+        opposite degree-3 corners, and two opposite degree-2 corners.
+        
+        If toroidal is true, the edges 'wrap around', so all vertices 
+        are degree 6.
+
+        Parameters
+        ----------
+        rows : int
+            DESCRIPTION.
+        cols : int
+            DESCRIPTION.
+        toroidal : bool
+            DESCRIPTION.
+
+        Returns
+        -------
+        Graph : TYPE
+            DESCRIPTION.
+
+        """
+        return Graph()
+    
+    def makeMooreLattice(rows:int, cols:int, toroidal:bool):
+        """
+        Make a graoh of rows x columns vertices that is is
+        internally 8-regular such that every vertex is in a
+        Moore neighborhood. If toroidal is false, the
+        graph will have edges of degree-5 vertices and four
+        corners of degree-3 vertices. If toroidal is true,
+        the edges 'wrap around', so all vertices are degree 8.
+
+        Parameters
+        ----------
+        rows : int
+            DESCRIPTION.
+        cols : int
+            DESCRIPTION.
+        toroidal : bool
+            DESCRIPTION.
+
+        Returns
+        -------
+        Graph : TYPE
+            DESCRIPTION.
+
+        """
+        return Graph()
     
     
     
